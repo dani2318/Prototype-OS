@@ -1,13 +1,21 @@
 #include <stdint.h>
 #include "stdio.h"
+#include "x86.h"
 // #include "disk.h"
 // #include "fat.h"
 
-// https://www.youtube.com/watch?v=db_5skZaneg&t=3412s [1:52:38]
+// https://www.youtube.com/watch?v=db_5skZaneg&t=3412s [3:16:06]
 
 void __attribute__((cdecl)) start(uint16_t bootDrive){
+  //clscr();
 
-  printf("Hello from stage2!");
+  uint8_t driveType;
+  uint16_t cylinders,sectors,heads;
+
+  x86_Disk_GetDriveParams(bootDrive, &driveType,&cylinders,&sectors,&heads);
+  printf("Read params: driveType=%u, cylinders=%u, sectors=%u, heads=%u\r\n",driveType,cylinders,sectors,heads);
+
+  //printf("Hello from stage2!\r\n");
 
   /*DISK disk;
   if(!DISK_Initialize(&disk,bootDrive)){

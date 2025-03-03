@@ -1,5 +1,8 @@
 {
   "files.associations": {
-      "stdio.h": "c"
+    "stdio.h": "c",
+    "stdarg.h": "c",
+    "compare": "cpp",
+    "stdint.h": "c"
   }
 }
