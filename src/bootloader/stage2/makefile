@@ -1,12 +1,8 @@
-BUILD_DIR?=build/
-ASM?= nasm
-SRC_DIR ?= src
-BUILD_DIR ?= build
 ASM_INCLUDES ?= $(SRC_DIR)/utils/asm/
-CFLAGS16 ?= -4 -d3 -s -wx -ms -zl -zq -za99
-CC16 ?= /usr/bin/watcom/binl64/wcc
-LD16 ?= /usr/bin/watcom/binl64/wlink
-
+TARGET_ASMFLAGS += -f elf
+TARGET_CFLAGS += -ffreestanding -nostdlib
+TARGET_LIBS += -lgcc
+TARGET_LINK_FLAGS += -T linker.ld -nostdlib
 SOURCES_C = $(wildcard *.c)
 SOURCES_ASM = $(wildcard *.asm)
 OBJECT_C = $(patsubst %.c, $(BUILD_DIR)/stage2/c/%.obj, $(SOURCES_C))
@@ -19,13 +15,13 @@ all: stage2
 stage2: $(BUILD_DIR)/stage2.bin
 
 $(BUILD_DIR)/stage2.bin: $(OBJECT_ASM) $(OBJECT_C)
-	$(LD16) NAME $(BUILD_DIR)/stage2.bin FILE \{$(OBJECT_ASM) $(OBJECT_C) \} OPTION MAP=$(BUILD_DIR)/stage2.map @linker.lnk
+	$(TARGET_LD) $(TARGET_LINK_FLAGS) -Wl,-Map=$(BUILD_DIR)/stage2.map -o $@ $^
 
 $(BUILD_DIR)/stage2/c/%.obj: %.c always
-	$(CC16) $(CFLAGS16) -fo=$@ $<
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $<
 
 $(BUILD_DIR)/stage2/asm/%.obj: %.asm always
-	$(ASM) -I$(ASM_INCLUDES) -f obj -o $@ $<
+	$(ASM) -I$(ASM_INCLUDES) $(TARGET_ASMFLAGS) -o $@ $<
 
 always:
 	mkdir -p $(BUILD_DIR)/stage2/c/
