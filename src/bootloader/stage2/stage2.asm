@@ -6,6 +6,7 @@ extern _cstart_
 global entry
 
 entry:
+
   cli
   mov ax, ds
   mov ss, ax

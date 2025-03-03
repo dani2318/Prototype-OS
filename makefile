@@ -6,7 +6,15 @@ SRC_DIR = src
 BUILD_DIR = build
 ASM_INCLUDES := $(SRC_DIR)/utils/asm/
 
+include build_scripts/config.mk
+
 .PHONY: all floppy_image kernel bootloader clean always
+
+
+
+all: floppy_image
+
+include build_scripts/toolchain.mk
 
 floppy_image: $(BUILD_DIR)/main_floppy.img
 

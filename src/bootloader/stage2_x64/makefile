@@ -3,9 +3,7 @@ ASM?= nasm
 SRC_DIR ?= src
 BUILD_DIR ?= build
 ASM_INCLUDES ?= $(SRC_DIR)/utils/asm/
-CFLAGS16 ?= -4 -d3 -s -wx -ms -zl -zq -za99
-CC16 ?= /usr/bin/watcom/binl64/wcc
-LD16 ?= /usr/bin/watcom/binl64/wlink
+ASM_FLAGS ?= -f elf
 
 SOURCES_C = $(wildcard *.c)
 SOURCES_ASM = $(wildcard *.asm)
@@ -25,7 +23,7 @@ $(BUILD_DIR)/stage2/c/%.obj: %.c always
 	$(CC16) $(CFLAGS16) -fo=$@ $<
 
 $(BUILD_DIR)/stage2/asm/%.obj: %.asm always
-	$(ASM) -I$(ASM_INCLUDES) -f obj -o $@ $<
+	$(ASM) -I$(ASM_INCLUDES) $(ASM_FLAGS) -o $@ $<
 
 always:
 	mkdir -p $(BUILD_DIR)/stage2/c/
