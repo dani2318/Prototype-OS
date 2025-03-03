@@ -1,16 +1,26 @@
-org 0x7C00
 bits 16
 
+section .entry
+
+extern __bss_start
+extern __end
+
+extern start
+global entry
+
 entry:
+    cli
+
+    ; save boot drive
+    mov [g_BootDrive], dl
+
     ; setup stack
-    mov ax, 0
-    mov ds, ax
-    mov es, ax
+    mov ax, ds
     mov ss, ax
-    mov sp, 7C00h
+    mov sp, 0xFFF0
+    mov bp, sp
 
     ; switch to protected mode
-    cli                     ; 1 - Disable interrupts
     call EnableA20          ; 2 - Enable A20 gate
     call LoadGDT            ; 3 - Load GDT
 
@@ -22,80 +32,31 @@ entry:
     ; 5 - far jump into protected mode
     jmp dword 08h:.pmode
 
-
 .pmode:
     ; we are now in protected mode!
     [bits 32]
-    
+
     ; 6 - setup segment registers
     mov ax, 0x10
     mov ds, ax
     mov ss, ax
 
-  ;https://www.youtube.com/watch?v=db_5skZaneg&list=PLFjM7v6KGMpiH2G-kT781ByCNC_0pKpPN&index=11 [56:52]
-
-    ; print hello world
-    mov esi, g_Hello
-    mov edi, ScreenBuffer
+    ; clear bss (uninitialized data)
+    mov edi, __bss_start
+    mov ecx, __end
+    sub ecx, edi
+    mov al, 0
     cld
+    rep stosb
 
-    mov bl, 1
+    ; expect boot drive in dl, send it as argument to cstart function
+    xor edx, edx
+    mov dl, [g_BootDrive]
+    push edx
+    call start
 
-.loop:
-    lodsb
-    or al, al
-    jz .done
-
-    mov [edi], al
-    inc edi
-
-    mov [edi], bl
-    inc edi
-    inc bl
-    jmp .loop
-
-.done:
-    ; go back to real mode
-    jmp word 18h:.pmode16         ; 1 - jump to 16-bit protected mode segment
-
-.pmode16:
-    [bits 16]
-
-    ; 2 - disable protected mode bit in cr0
-    mov eax, cr0
-    and al, ~1
-    mov cr0, eax
-
-    ; 3 - jump to real mode
-    jmp word 00h:.rmode
-
-.rmode:
-    ; 4 - setup segments
-    mov ax, 0
-    mov ds, ax
-    mov ss, ax
-
-    ; 5 - enable interrupts
-    sti
-
-    ; print hello world using int 10h
-    mov si, g_HelloR
-
-.rloop:
-    lodsb
-    or al, al
-    jz .rdone
-    mov ah, 0eh
-    int 10h
-    jmp .rloop
-
-.rdone:
-
-    ; To go back to protected mode, disable interrupts and repeat steps 4-6
-
-
-.halt:
-    jmp .halt
+    cli
+    hlt
 
 
 EnableA20:
@@ -118,7 +79,7 @@ EnableA20:
     call A20WaitInput
     mov al, KbdControllerWriteCtrlOutputPort
     out KbdControllerCommandPort, al
-    
+
     call A20WaitInput
     pop eax
     or al, 2                                    ; bit 2 = A20 bit
@@ -205,8 +166,4 @@ g_GDT:      ; NULL descriptor
 g_GDTDesc:  dw g_GDTDesc - g_GDT - 1    ; limit = size of GDT
             dd g_GDT                    ; address of GDT
 
-g_Hello:    db "Hello world from protected mode!", 0
-g_HelloR:   db "Hello world from real mode!", 0
-
-times 510-($-$$) db 0
-dw 0AA55h
+g_BootDrive: db 0

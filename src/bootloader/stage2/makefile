@@ -15,13 +15,16 @@ all: stage2
 stage2: $(BUILD_DIR)/stage2.bin
 
 $(BUILD_DIR)/stage2.bin: $(OBJECT_ASM) $(OBJECT_C)
-	$(TARGET_LD) $(TARGET_LINK_FLAGS) -Wl,-Map=$(BUILD_DIR)/stage2.map -o $@ $^
+	$(TARGET_LD) $(TARGET_LINK_FLAGS) -Wl,-Map=$(BUILD_DIR)/stage2.map -o $@ $^ $(TARGET_LIBS)
+	@echo "--> Created  stage2.bin"
 
 $(BUILD_DIR)/stage2/c/%.obj: %.c always
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $<
+	@echo "--> Compiled: " $<
 
 $(BUILD_DIR)/stage2/asm/%.obj: %.asm always
 	$(ASM) -I$(ASM_INCLUDES) $(TARGET_ASMFLAGS) -o $@ $<
+	@echo "--> Compiled: " $<
 
 always:
 	mkdir -p $(BUILD_DIR)/stage2/c/

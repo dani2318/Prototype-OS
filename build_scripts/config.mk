@@ -1,20 +1,20 @@
 export CFLAGS = -std=99 -g #! remove this if binutils and gcc do not compile correctly!
-export ASMFLAGS = 
+export ASMFLAGS =
 export CC = gcc
 export CXX = g++
 export LD = gcc
-export LINK_FLAGS = 
+export LINK_FLAGS =
 export LIBS =
 #https://www.youtube.com/watch?v=db_5skZaneg&list=PLFjM7v6KGMpiH2G-kT781ByCNC_0pKpPN&index=11
 
 export TARGET = i686-elf
-export TARGET_CFLAGS = -std=99 -g #-O2 
+export TARGET_CFLAGS = -std=c99 -g #-O2
 export ASM = nasm
-export TARGET_ASMFLAGS = 
+export TARGET_ASMFLAGS =
 export TARGET_CC = $(TARGET)-gcc
 export TARGET_CXX = $(TARGET)-g++
 export TARGET_LD = $(TARGET)-gcc
-export TARGET_LINK_FLAGS = 
+export TARGET_LINK_FLAGS =
 export TARGET_LIBS =
 
 CC16 = /usr/bin/watcom/binl64/wcc
