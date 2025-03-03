@@ -1,2 +1,2 @@
-toolchain/
-build/
+toolchain/*
+build/*
