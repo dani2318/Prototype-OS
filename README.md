@@ -14,3 +14,4 @@
       <b>NB:</b> To build with the bootloader please replace stage2 with stage2_old folder<br>
       Once installed the dependencies run the make comand<br>
       to run the os execute: <b>run.bat</b><br>
+      to install toolchain execute <b>make toolchain</b>
