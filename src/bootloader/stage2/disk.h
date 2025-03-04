@@ -1,7 +1,8 @@
 #pragma once
 
 
-#include "stdint.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 typedef struct
 {
@@ -12,4 +13,4 @@ typedef struct
 } DISK;
 
 bool DISK_Initialize(DISK* disk, uint8_t driveNumber);
-bool DISK_ReadSectors(DISK* disk, uint32_t lba, uint8_t sectors, void far* dataOut);
+bool DISK_ReadSectors(DISK* disk, uint32_t lba, uint8_t sectors, void * lowerdataOut);

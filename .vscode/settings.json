@@ -1,0 +1,11 @@
+{
+  "files.associations": {
+    "stdio.h": "c",
+    "stdarg.h": "c",
+    "compare": "cpp",
+    "stdint.h": "c",
+    "ctype.h": "c",
+    "fat.h": "c",
+    "memdefs.h": "c"
+  }
+}
