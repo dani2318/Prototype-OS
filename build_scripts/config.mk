@@ -1,10 +1,11 @@
-#export CFLAGS = -std=99 -g #! remove this if binutils and gcc do not compile correctly!
+export CFLAGS = -std=99 -g #! remove this if binutils and gcc do not compile correctly!
 export ASMFLAGS =
 export CC = gcc
 export CXX = g++
 export LD = gcc
 export LINK_FLAGS =
 export LIBS =
+#https://www.youtube.com/watch?v=db_5skZaneg&list=PLFjM7v6KGMpiH2G-kT781ByCNC_0pKpPN&index=11
 
 export TARGET = i686-elf
 export TARGET_CFLAGS = -std=c99 -g #-O2
