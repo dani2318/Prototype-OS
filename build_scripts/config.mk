@@ -5,7 +5,6 @@ export CXX = g++
 export LD = gcc
 export LINK_FLAGS =
 export LIBS =
-#https://www.youtube.com/watch?v=db_5skZaneg&list=PLFjM7v6KGMpiH2G-kT781ByCNC_0pKpPN&index=11
 
 export TARGET = i686-elf
 export TARGET_CFLAGS = -std=c99 -g #-O2
@@ -16,6 +15,7 @@ export TARGET_CXX = $(TARGET)-g++
 export TARGET_LD = $(TARGET)-gcc
 export TARGET_LINK_FLAGS =
 export TARGET_LIBS =
+export SOURCE_DIR = $(abspath .)
 
 CC16 = /usr/bin/watcom/binl64/wcc
 LD16 = /usr/bin/watcom/binl64/wlink

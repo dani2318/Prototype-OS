@@ -12,6 +12,8 @@
     "regex": "c",
     "gdt.h": "c",
     "binary.h": "c",
-    "idt.h": "c"
+    "idt.h": "c",
+    "stdbool.h": "c",
+    "isr.h": "c"
   }
 }

@@ -16,21 +16,25 @@ OBJECT_ASM = $(patsubst %.asm, $(BUILD_DIR)/kernel/asm/%.obj, $(SOURCES_ASM))
 
 all: kernel
 
-kernel: $(BUILD_DIR)/oskrnl.bin
+kernel: arch/i686/isrs_gen.c arch/i686/isrs_gen.inc $(BUILD_DIR)/oskrnl.bin
 
 $(BUILD_DIR)/oskrnl.bin: $(OBJECT_ASM) $(OBJECT_C)
 	$(TARGET_LD) $(TARGET_LINK_FLAGS) -Wl,-Map=$(BUILD_DIR)/oskrnl.map -o $@ $^ $(TARGET_LIBS)
 	@echo "--> Created  oskrnl.bin"
 
-$(BUILD_DIR)/kernel/c/%.obj: %.c
+$(BUILD_DIR)/kernel/c/%.obj: %.c $(HEADERS_C)
 	@mkdir -p $(@D)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $<
 	@echo "--> Compiled: " $<
 
-$(BUILD_DIR)/kernel/asm/%.obj: %.asm
+$(BUILD_DIR)/kernel/asm/%.obj: %.asm $(HEADERS_ASM)
 	@mkdir -p $(@D)
 	$(ASM) -I$(ASM_INCLUDES) $(TARGET_ASMFLAGS) -o $@ $<
 	@echo "--> Compiled: " $<
 
 clean:
 	rm -f $(BUILD_DIR)/oskrnl.bin
+
+
+arch/i686/isrs_gen.c arch/i686/isrs_gen.inc:
+	@$(SOURCE_DIR)/build_scripts/generate_isrs.sh $(SOURCE_DIR)/src/kernel/arch/i686/isrs_gen.c $(SOURCE_DIR)/src/kernel/arch/i686/isrs_gen.inc
