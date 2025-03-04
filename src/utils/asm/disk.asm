@@ -37,18 +37,7 @@ lba_to_chs:
   pop ax
   ret
 
-floppy_error:
-  mov si, msg_read_failed
-  call puts
-  jmp wait_key_and_reboot
-wait_key_and_reboot:
-  mov ah, 0
-  int 16h                          ; wait for keypress
-  jmp 0FFFFh:0                     ; jump to beginning of BIOS, should reboot
 
-.halt:
-  cli
-  hlt
 
 ;
 ; Reads from disk.
@@ -110,6 +99,7 @@ disk_reset:
   jc floppy_error
   popa
   ret
+
 
 
 msg_read_failed:      db 'Disk read failed!', ENDL, 0
