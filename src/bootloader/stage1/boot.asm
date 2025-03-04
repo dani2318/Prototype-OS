@@ -183,9 +183,6 @@ start:
 
 %include "handlers.asm"
 
-.halt:
-    cli                         ; disable interrupts, this way CPU can't get out of "halt" state
-    hlt
 
 
 
