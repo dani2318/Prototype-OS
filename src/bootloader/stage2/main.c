@@ -2,11 +2,14 @@
 #include "stdio.h"
 #include "x86.h"
 #include "disk.h"
-// #include "fat.h"
+#include "fat.h"
+#include "memdefs.h"
+#include "memory.h"
 
-// https://www.youtube.com/watch?v=db_5skZaneg&t=3412s [3:16:06]
+uint8_t* KernelLoadBuffer = (uint8_t*)MEMORY_LOAD_KERNEL;
+uint8_t* Kernel = (uint8_t*)MEMORY_KERNEL_ADDR;
 
-void* g_data = (void*) 0x20000;
+typedef void (*KernelStart)();
 
 void __attribute__((cdecl)) start(uint16_t bootDrive){
   clscr();
@@ -18,45 +21,32 @@ void __attribute__((cdecl)) start(uint16_t bootDrive){
 
   DISK disk;
   if(!DISK_Initialize(&disk,bootDrive)){
-    printf("Disk init error \r\n");
+    printf("DISK: init error \r\n");
     goto end;
   }
 
-  DISK_ReadSectors(&disk,0,1,g_data);
-  print_buffer("Boot sector: ",g_data, 512);
-
-  /*if(!FAT_Initialize(&disk)){
-    printf("FAT init error \r\n");
+  if(!FAT_Initialize(&disk)){
+    printf("FAT: init error \r\n");
     goto end;
   }
 
-  FAT_File far* fd = FAT_Open(&disk, "/");
-  FAT_DirectoryEntry entry;
-  int i = 0;
-  while (FAT_ReadEntry(&disk, fd, &entry) && i++ < 5)
-  {
-      printf("  ");
-      for (int i = 0; i < 11; i++)
-          putc(entry.Name[i]);
-      printf("\r\n");
-  }
-  FAT_Close(fd);
-
-  // read test.txt
-  char buffer[100];
+  // load kernel
+  FAT_File * fd = FAT_Open(&disk, "/oskrnl.bin");
   uint32_t read;
-  fd = FAT_Open(&disk, "mydir/test.txt");
-  while ((read = FAT_Read(&disk, fd, sizeof(buffer), buffer)))
+
+  uint8_t* kernelbuffer = Kernel;
+
+  while ((read = FAT_Read(&disk, fd, MEMORY_LOAD_SIZE,KernelLoadBuffer)))
   {
-      for (uint32_t i = 0; i < read; i++)
-      {
-          if (buffer[i] == '\n')
-              putc('\r');
-          putc(buffer[i]);
-      }
+    memcpy(kernelbuffer,KernelLoadBuffer, read);
+    kernelbuffer += read;
   }
   FAT_Close(fd);
-*/
+
+  // exec kernel
+  KernelStart kernelstart = (KernelStart)Kernel;
+  kernelstart();
+
 end:
   for(;;);
 }
