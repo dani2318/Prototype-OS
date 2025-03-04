@@ -6,6 +6,14 @@
     "stdint.h": "c",
     "ctype.h": "c",
     "fat.h": "c",
-    "memdefs.h": "c"
+    "memdefs.h": "c",
+    "ranges": "c",
+    "internet": "c",
+    "regex": "c",
+    "gdt.h": "c",
+    "binary.h": "c",
+    "idt.h": "c",
+    "stdbool.h": "c",
+    "isr.h": "c"
   }
 }
