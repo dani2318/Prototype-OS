@@ -1,5 +1,10 @@
 #pragma once
 #include "isr.h"
+#include "pic.h"
+#include "i8259.h"
+#include "io.h"
+#include <stddef.h>
+#include "stdio.h"
 
 typedef void (*IRQHandler)(Registers* regs);
 

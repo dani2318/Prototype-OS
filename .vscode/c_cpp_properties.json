@@ -1,20 +1,12 @@
 {
     "configurations": [
         {
-            "name": "Linux",
-            "includePath": [
-                "${workspaceFolder}/**"
-            ],
-            "defines": [],
-            "compilerPath": "/usr/bin/gcc",
-            "cStandard": "c17",
-            "cppStandard": "gnu++17",
-            "intelliSenseMode": "linux-gcc-x64"
-        },
-        {
             "name": "GCC",
             "includePath": [
                 "${workspaceFolder}/**",
+                "${workspaceFolder}/src/kernel/**",
+                "${workspaceFolder}/src/bootloader/stage1/**",
+                "${workspaceFolder}/src/bootloader/stage2/**",
                 "${workspaceFolder}/toolchain/i686-elf/lib/gcc/i686-elf/11.2.0/include"
             ],
             "defines": [],
@@ -26,7 +18,8 @@
                 "-std=c99",
                 "-ffreestanding",
                 "-nostdlib"
-            ]
+            ],
+
         }
     ],
     "version": 4
