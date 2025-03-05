@@ -23,14 +23,13 @@ i686_Panic:
 
 
 ;uint8_t __attribute__((cdecl)) i686_EnableInterrupts();
-;uint8_t __attribute__((cdecl)) i686_DisableInterrupts();
-
 global i686_EnableInterrupts
 i686_EnableInterrupts:
   sti
   ret
 
 
+;uint8_t __attribute__((cdecl)) i686_DisableInterrupts();
 global i686_DisableInterrupts
 i686_DisableInterrupts:
   cli

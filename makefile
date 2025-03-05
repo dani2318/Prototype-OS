@@ -47,3 +47,5 @@ clear:
 	$(MAKE) -C $(SRC_DIR)/kernel BUILD_DIR=$(abspath $(BUILD_DIR)) ASM_INCLUDES=$(abspath $(ASM_INCLUDES)) clean
 	rm -rf $(BUILD_DIR)/*
 
+run:
+	qemu-system-i386 -fda $(BUILD_DIR)/main_floppy.img

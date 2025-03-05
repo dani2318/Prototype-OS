@@ -1,5 +1,5 @@
 #include "irq.h"
-#include "pic.h"
+#include "i8259.h"
 #include "io.h"
 #include <stddef.h>
 #include <stdio.h>
@@ -12,19 +12,19 @@ IRQHandler g_IRQHandlers[16];
 void i686_IRQ_Handler(Registers* regs){
     int irq = regs->interrupt - PIC_REMAP_OFFSET;
 
-    uint8_t pic_isr = i686_PIC_ReadInServiceRegister();
-    uint8_t pic_irr = i686_PIC_GetIRQRequestRegister();
+    uint8_t pic_isr = i8259_ReadInServiceRegister();
+    uint8_t pic_irr = i8259_GetIRQRequestRegister();
 
     if(g_IRQHandlers[irq] != NULL){
         g_IRQHandlers[irq](regs);        
     }else{
         printf("Unhandled IRQ %d  ISR=%x  IRR=%x...\n", irq, pic_isr, pic_irr);    }
     
-    i686_PIC_SendEndOfInterrupt(irq);
+    i8259_SendEndOfInterrupt(irq);
 }
 
 void i686_IRQ_Initialize(){
-    i686_PIC_Configure(PIC_REMAP_OFFSET, PIC_REMAP_OFFSET + 8);
+    i8259_Configure(PIC_REMAP_OFFSET, PIC_REMAP_OFFSET + 8, true);
     for(int i = 0; i < 16; i++)
         i686_ISR_RegisterHandler(PIC_REMAP_OFFSET + i , i686_IRQ_Handler);
     i686_EnableInterrupts();
