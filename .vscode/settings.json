@@ -14,6 +14,9 @@
     "binary.h": "c",
     "idt.h": "c",
     "stdbool.h": "c",
-    "isr.h": "c"
+    "isr.h": "c",
+    "pic.h": "c",
+    "io.h": "c",
+    "irq.h": "c"
   }
 }
