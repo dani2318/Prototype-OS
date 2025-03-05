@@ -17,8 +17,6 @@ export TARGET_LINK_FLAGS =
 export TARGET_LIBS =
 export SOURCE_DIR = $(abspath .)
 
-CC16 = /usr/bin/watcom/binl64/wcc
-LD16 = /usr/bin/watcom/binl64/wlink
 SRC_DIR = src
 BUILD_DIR = build
 ASM_INCLUDES := $(SRC_DIR)/utils/asm/

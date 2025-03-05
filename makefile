@@ -1,5 +1,3 @@
-
-
 include build_scripts/config.mk
 
 .PHONY: all floppy_image kernel bootloader clean always
