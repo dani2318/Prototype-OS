@@ -3,8 +3,8 @@ TARGET_ASMFLAGS += -f elf
 TARGET_CFLAGS += -ffreestanding -nostdlib
 TARGET_LIBS += -lgcc
 TARGET_LINK_FLAGS += -T linker.ld -nostdlib
-SOURCES_C = $(wildcard *.c)
-SOURCES_ASM = $(wildcard *.asm)
+SOURCES_C = $(shell find . -type f -name "*.c")
+SOURCES_ASM = $(shell find . -type f -name "*.asm")
 OBJECT_C = $(patsubst %.c, $(BUILD_DIR)/stage2/c/%.obj, $(SOURCES_C))
 OBJECT_ASM = $(patsubst %.asm, $(BUILD_DIR)/stage2/asm/%.obj, $(SOURCES_ASM))
 

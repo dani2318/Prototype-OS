@@ -1,6 +1,5 @@
 %include "macros.asm"
 
-
 global x86_outb
 
 x86_outb:
@@ -181,3 +180,134 @@ x86_Disk_Read:
     mov esp, ebp
     pop ebp
     ret
+
+
+; int __attribute__((cdecl)) x86_Video_GetVbeInfo(void* infoOut);
+global x86_Video_GetVbeInfo
+x86_Video_GetVbeInfo:
+
+    ; make new call frame
+    push ebp             ; save old call frame
+    mov ebp, esp          ; initialize new call frame
+
+    push edi
+    push es
+    push ebp
+
+    x86_EnterRealMode
+
+    mov eax, 0x4f00
+    LinearToSegOffset [bp + 8], es, edi, di
+    int 10h
+
+    cmp al, 4fh
+    jne .error
+
+
+    pop ebp
+    pop es
+    pop edi
+
+    push eax
+
+    x86_EnterProtectedMode
+
+    pop eax
+
+    ; restore old call frame
+    mov esp, ebp
+    pop ebp
+    ret
+
+.error:
+  mov al, -1
+
+
+;int __attribute__((cdecl)) x86_Video_GetModeInfo(uint16_t mode, void* infoOut);
+global x86_Video_GetModeInfo
+x86_Video_GetModeInfo:
+
+    ; make new call frame
+    push ebp             ; save old call frame
+    mov ebp, esp          ; initialize new call frame
+
+    push edi
+    push es
+    push ebp
+    push ecx
+
+    x86_EnterRealMode
+
+    mov eax, 0x4f01
+    mov cx, [bp + 8]
+    LinearToSegOffset [bp + 12], es, edi, di
+    int 10h
+
+    cmp al, 4fh
+    jne .error
+
+    pop ecx
+    pop ebp
+    pop es
+    pop edi
+
+
+    push eax
+
+    x86_EnterProtectedMode
+
+    pop eax
+
+    ; restore old call frame
+    mov esp, ebp
+    pop ebp
+    ret
+
+.error:
+  mov al, -1
+
+
+;int __attribute__((cdecl)) x86_Video_GetModeInfo(uint16_t mode, void* infoOut);
+global x86_Video_SetMode
+x86_Video_SetMode:
+
+    ; make new call frame
+    push ebp             ; save old call frame
+    mov ebp, esp          ; initialize new call frame
+
+    push edi
+    push es
+    push ebp
+    push ebx
+
+    x86_EnterRealMode
+
+    mov ax, 0
+    mov es, ax
+    mov edi,0
+
+    mov eax, 0x4f02
+    mov bx, [bp + 8]
+    int 10h
+
+    cmp al, 4fh
+    jne .error
+
+    pop ebx
+    pop ebp
+    pop es
+    pop edi
+
+    push eax
+
+    x86_EnterProtectedMode
+
+    pop eax
+
+    ; restore old call frame
+    mov esp, ebp
+    pop ebp
+    ret
+
+.error:
+  mov al, -1
