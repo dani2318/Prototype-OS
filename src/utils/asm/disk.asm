@@ -42,22 +42,30 @@ lba_to_chs:
 ;
 ; Reads from disk.
 ;   Params:
-;       -  ax: LBA addr.
+;       -  eax: LBA addr.
 ;       -  cl: numbers of sectors to read (up to 128).
 ;       -  dl: drive number
 ;       -  es:bx: memory address where to store read data
 ;
 disk_read:
 
-  push ax
+  push eax
   push bx
   push cx
   push dx
   push di
 
+  cmp byte[have_exts], 1
+  jne .no_exts
+
+  ;with exts
+  mov ah, 0x42
+
+.no_exts:
   push cx                          ; temporarily save CL (number of sectors to read)
   call lba_to_chs                  ; compute CHS
   pop  ax                          ; AL = number of sectors to read
+  
   mov  ah, 02h
   mov di, 3
 
@@ -83,7 +91,7 @@ disk_read:
   pop dx
   pop cx
   pop bx
-  pop ax
+  pop eax
   ret
 
 ;
