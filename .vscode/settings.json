@@ -5,5 +5,7 @@
     "stdint.h": "c",
     "disk.h": "c",
     "x86.h": "c"
-  }
+  },
+  "python.analysis.autoImportCompletions": false,
+  "python.analysis.typeCheckingMode": "standard"
 }
