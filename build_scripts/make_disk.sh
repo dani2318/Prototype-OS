@@ -28,27 +28,39 @@ if [ ${STAGE2_SECTORS} \> $((${DISK_PART1_BEGIN} - 1)) ]; then
     exit 2
 fi
 
-dd if=${BUILD_DIR}/stage2.bin of=$TARGET conv=notrunc bs=512 seek=1 >/dev/null
+ dd if=${BUILD_DIR}/stage2.bin of=$TARGET conv=notrunc bs=512 seek=1 >/dev/null
 
 #create loop device
-DEVICE=$(losetup -fP --show ${SOURCE_DIR}/${TARGET})
+DEVICE=$( losetup -fP --show ${SOURCE_DIR}/${TARGET})
 TARGET_PART="${DEVICE}p1"
 
 #create fs
-mkfs.fat -n "PROTOS" $TARGET_PART >/dev/null
+echo "Creating filesystem for ${TARGET_PART}"
+ mkfs.fat -n "PROTOS" $TARGET_PART >/dev/null
 
-dd if=${BUILD_DIR}/stage1.bin of=$TARGET_PART conv=notrunc bs=1 count=3 >/dev/null
-dd if=${BUILD_DIR}/stage1.bin of=$TARGET_PART conv=notrunc bs=1 seek=90 skip=90 >/dev/null
+echo "Installing bootloader to ${TARGET_PART}"
+ dd if=${BUILD_DIR}/stage1.bin of=$TARGET_PART conv=notrunc bs=1 count=3 >/dev/null
+ dd if=${BUILD_DIR}/stage1.bin of=$TARGET_PART conv=notrunc bs=1 seek=90 skip=90 >/dev/null
 
-echo "01 00 00 00" | xxd -r -p | dd of=$TARGET_PART conv=notrunc bs=1 seek=$STAGE1_STAGE2_LOCATION_OFFSET
-printf "%x" ${STAGE2_SECTORS} | xxd -r -p | dd of=$TARGET_PART conv=notrunc bs=1 seek=$(( $STAGE1_STAGE2_LOCATION_OFFSET + 4 ))
+echo "01 00 00 00" | xxd -r -p |  dd of=$TARGET_PART conv=notrunc bs=1 seek=$STAGE1_STAGE2_LOCATION_OFFSET
+printf "%x" ${STAGE2_SECTORS} | xxd -r -p |  dd of=$TARGET_PART conv=notrunc bs=1 seek=$(( $STAGE1_STAGE2_LOCATION_OFFSET + 4 ))
+
+# Copy files to disk image
+
+echo "Copying files to ${TARGET_PART}"
+mkdir -p /tmp/protos
+mount ${TARGET_PART} /tmp/protos
+
+cp ${BUILD_DIR}/oskrnl.bin /tmp/protos
+cp test.txt /tmp/protos
+mkdir /tmp/protos/myDir/
+cp test.txt /tmp/protos/myDir/
 
 
-# copy files
-# mcopy -i $TARGET_PART ${BUILD_DIR}/oskrnl.bin "::oskrnl.bin"
-# mcopy -i $TARGET_PART test.txt "::test.txt"
-# mmd -i $TARGET_PART "::mydir"
-# mcopy -i $TARGET_PART test.txt "::mydir/test.txt"
+echo "Unmounting and deleating temporary directory"
+umount /tmp/protos
+rm -rf /tmp/protos
+
 
 #destroy loop device
-losetup -d ${DEVICE}
+ losetup -d ${DEVICE}

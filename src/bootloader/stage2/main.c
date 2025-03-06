@@ -80,12 +80,6 @@ void __attribute__((cdecl)) start(uint16_t bootDrive){
     }
     if(pickedMode != 0xFFFF&& VBE_SetMode(pickedMode)) { // && VBE_SetMode(pickedMode) ! NOTE: TO ENABLE VBE ADD THIS TO THE IF CONDITION! (FOR NOW IT'S DISABLED)
       fb = (uint32_t*)(modeinfo->framebuffer);
-      int w = modeinfo->width; int h = modeinfo->height;
-      for(int y= 0; y < h; y++){
-        for(int x = 0; x < w; x++){
-          fb[y*modeinfo->pitch/4 + x] = COLOR(x,y,x+y);
-        }
-      }
     }
   }else{
     printf("No VBE extensions.\r\n");
@@ -95,7 +89,7 @@ void __attribute__((cdecl)) start(uint16_t bootDrive){
 
   // exec kernel
   KernelStart kernelstart = (KernelStart)Kernel;
-  //kernelstart();
+  kernelstart();
 
 end:
   for(;;);

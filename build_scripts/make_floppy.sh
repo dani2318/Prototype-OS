@@ -16,7 +16,7 @@ echo ${RESERVED_SECTORS}
 mkfs.fat -F 12 -R ${RESERVED_SECTORS} -n "PROTOS" $TARGET >/dev/null
 
 dd if=${BUILD_DIR}/stage1.bin of=$TARGET conv=notrunc bs=1 count=3 >/dev/null
-dd if=${BUILD_DIR}/stage1.bin of=$TARGET conv=notrunc bs=1 seek=90 skip=90 >/dev/null
+dd if=${BUILD_DIR}/stage1.bin of=$TARGET conv=notrunc bs=1 seek=62 skip=62 >/dev/null
 dd if=${BUILD_DIR}/stage2.bin of=$TARGET conv=notrunc bs=512 seek=1 >/dev/null
 
 echo "01 00 00 00" | xxd -r -p | dd of=$TARGET conv=notrunc bs=1 seek=$STAGE1_STAGE2_LOCATION_OFFSET
