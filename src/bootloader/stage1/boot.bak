@@ -11,8 +11,6 @@ nop
 
 %include "header.asm"
 
-
-
 start:
     ; setup data segments
     mov ax, 0           ; can't set ds/es directly
@@ -39,52 +37,20 @@ start:
     mov si, msg_loading
     call puts
 
-    ;check exts
-    mov ah, 0x41
-    mov bx, 0x55AA
-    stc
+    ; read drive parameters (sectors per track and head count),
+    ; instead of relying on data on formatted disk
+    push es
+    mov ah, 08h
     int 13h
+    jc floppy_error
+    pop es
 
-    jc .no_disk_extensions
-    cmp bx, 0xAA55
-    jne .no_disk_extensions
-
-    ; ext present
-    mov byte [have_exts], 1
-    jmp .after_disk_extensions
-
-.no_disk_extensions:
-    mov byte [have_exts], 0
-
-.after_disk_extensions:
-    ; load stage2
-    mov si, stage2_location
-
-    mov ax, STAGE2_LOAD_SEGMENT         ; set segment registers
-    mov es, ax
-
-    mov bx, STAGE2_LOAD_OFFSET
-
-.loop:
-    mov eax, [si]
-    add si, 4
-    mov cl, [si]
-    inc si
-
-    cmp eax, 0
-    je .read_finish
-
-    call disk_read
-
+    and cl, 0x3F                        ; remove top 2 bits
     xor ch, ch
-    shl cx, 5
+    mov [bdb_sectors_per_track], cx     ; sector count
 
-    mov di, es
-    add di, cx
-    mov es, di
-
-    jmp .loop
-
+    inc dh
+    mov [bdb_heads], dh                 ; head count
 
 .read_finish:
 
@@ -108,14 +74,23 @@ start:
 ;
 
 %include "handlers.asm"
+
+
+
+
 %include "print.asm"
+
 %include "disk.asm"
-%include "data.asm"
 
-times 510-30-($-$$) db 0
+msg_loading:            db 'Loading...', ENDL, 0
+msg_stage2_not_found:   db 'STAGE2.BIN file not found!', ENDL, 0
+file_stage2_bin:        db 'STAGE2  BIN'
+stage2_cluster:         dw 0
 
-stage2_location:        times 30 db 0
+STAGE2_LOAD_SEGMENT     equ 0x0
+STAGE2_LOAD_OFFSET      equ 0x500
 
+times 510-($-$$) db 0
 dw 0AA55h
 
 buffer:

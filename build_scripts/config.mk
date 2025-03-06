@@ -1,3 +1,5 @@
+MAKE_DISK_SIZE = 16777216 # 16MB
+
 export CFLAGS = -std=99 -g #! remove this if binutils and gcc do not compile correctly!
 export ASMFLAGS =
 export CC = gcc
@@ -18,7 +20,7 @@ export TARGET_LIBS =
 export SOURCE_DIR = $(abspath .)
 
 SRC_DIR = src
-BUILD_DIR = build
+export BUILD_DIR = $(abspath build)
 ASM_INCLUDES := $(SRC_DIR)/utils/asm/
 
 BINUTILS_VER = 2.37

@@ -49,8 +49,8 @@ void __attribute__((cdecl)) start(uint16_t bootDrive){
 
   uint16_t pickedMode = 0xffff;
   uint32_t* fb = NULL;
-  const int desiderWidth = 2560;
-  const int desiderHeight = 1440;
+  const int desiderWidth = 800;
+  const int desiderHeight = 600;
   const int desiderBPP = 32;
 
   VbeInfoBlock* info = (VbeInfoBlock*)MEMORY_VESA_INFO;
@@ -78,12 +78,13 @@ void __attribute__((cdecl)) start(uint16_t bootDrive){
 
       }
     }
-    if(pickedMode != 0xFFFF ){ // && VBE_SetMode(pickedMode) ! NOTE: TO ENABLE VBE ADD THIS TO THE IF CONDITION! (FOR NOW IT'S DISABLED)
+    if(pickedMode != 0xFFFF) { // && VBE_SetMode(pickedMode) ! NOTE: TO ENABLE VBE ADD THIS TO THE IF CONDITION! (FOR NOW IT'S DISABLED)
       fb = (uint32_t*)(modeinfo->framebuffer);
     }
   }else{
     printf("No VBE extensions.\r\n");
   }
+
 
 
   // exec kernel

@@ -4,6 +4,7 @@
 ;
 %define ENDL 0x0D,0x0A
 
+
 ;
 ; Converts an LBA addr. to a CHS addr.
 ;   Params:
@@ -42,22 +43,39 @@ lba_to_chs:
 ;
 ; Reads from disk.
 ;   Params:
-;       -  ax: LBA addr.
+;       -  eax: LBA addr.
 ;       -  cl: numbers of sectors to read (up to 128).
 ;       -  dl: drive number
 ;       -  es:bx: memory address where to store read data
 ;
 disk_read:
 
-  push ax
+  push eax
   push bx
   push cx
   push dx
+  push si
   push di
 
+  cmp byte[have_exts], 1
+  jne .no_exts
+
+  ;with exts
+  mov [extensions_dap.lba], eax
+  mov [extensions_dap.segment], es
+  mov [extensions_dap.offset], bx
+  mov [extensions_dap.count], cl
+
+  mov ah, 0x42
+  mov si, extensions_dap
+  mov di, 3
+  jmp .retry
+
+.no_exts:
   push cx                          ; temporarily save CL (number of sectors to read)
   call lba_to_chs                  ; compute CHS
   pop  ax                          ; AL = number of sectors to read
+
   mov  ah, 02h
   mov di, 3
 
@@ -66,6 +84,8 @@ disk_read:
   stc                              ; set carry flag, some BIOS'es don't set it
   int 13h                          ; carry flag cleared = success
   jnc .done                        ; jump if carry not set
+
+  popa
   call disk_reset
 
   ; disk read failed
@@ -80,10 +100,11 @@ disk_read:
   popa
 
   pop di
+  pop si
   pop dx
   pop cx
   pop bx
-  pop ax
+  pop eax
   ret
 
 ;

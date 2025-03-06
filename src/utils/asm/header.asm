@@ -1,4 +1,3 @@
-
 bdb_oem:                    db 'MSWIN4.1'         ; 8 bytes
 bdb_bytes_per_sector:       dw 512
 bdb_sectors_per_cluser:     db 1
@@ -21,6 +20,7 @@ ebr_drive_number:           db 0
                             db 0
 ebr_signature:              db 29h
 ebr_volume_id:              db 12h, 34h, 56h, 78h ; serial number
-ebr_volume_label:           db 'OSDEV      '      ; 11 bytes, padded with spaces
+ebr_volume_label:           db 'PROT     OS'      ; 11 bytes, padded with spaces
 ebr_system_id:              db 'FAT12   '         ; 8 bytes, padded with spaces
 
+times 90-($-$$) db 0
