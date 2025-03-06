@@ -44,3 +44,6 @@ clear:
 
 run:
 	qemu-system-i386 -fda $(BUILD_DIR)/main_floppy.img
+
+run_disk:
+	qemu-system-i386 -m 16 -boot c -hda $(BUILD_DIR)/main_disk.raw

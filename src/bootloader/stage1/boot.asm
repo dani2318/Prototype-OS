@@ -158,6 +158,7 @@ disk_read:
   push bx
   push cx
   push dx
+  push si
   push di
 
   cmp byte[have_exts], 1
@@ -168,6 +169,7 @@ disk_read:
   mov [extensions_dap.segment], es
   mov [extensions_dap.offset], bx
   mov [extensions_dap.count], cl
+  
   mov ah, 0x42
   mov si, extensions_dap
   mov di, 3
@@ -202,6 +204,7 @@ disk_read:
   popa
 
   pop di
+  pop si
   pop dx
   pop cx
   pop bx
@@ -236,8 +239,8 @@ extensions_dap:
     .size:              db 10h
                         db 0
     .count:             dw 0
-    .segment:           dw 0
     .offset:            dw 0
+    .segment:           dw 0
     .lba:               dq 0
 
 STAGE2_LOAD_SEGMENT     equ 0x0

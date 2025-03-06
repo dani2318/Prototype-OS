@@ -78,7 +78,7 @@ void __attribute__((cdecl)) start(uint16_t bootDrive){
 
       }
     }
-    if(pickedMode != 0xFFFF&& VBE_SetMode(pickedMode)) { // && VBE_SetMode(pickedMode) ! NOTE: TO ENABLE VBE ADD THIS TO THE IF CONDITION! (FOR NOW IT'S DISABLED)
+    if(pickedMode != 0xFFFF) { // && VBE_SetMode(pickedMode) ! NOTE: TO ENABLE VBE ADD THIS TO THE IF CONDITION! (FOR NOW IT'S DISABLED)
       fb = (uint32_t*)(modeinfo->framebuffer);
     }
   }else{
