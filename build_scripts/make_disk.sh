@@ -28,10 +28,10 @@ if [ ${STAGE2_SECTORS} \> $((${DISK_PART1_BEGIN} - 1)) ]; then
     exit 2
 fi
 
- dd if=${BUILD_DIR}/stage2.bin of=$TARGET conv=notrunc bs=512 seek=1 >/dev/null
+dd if=${BUILD_DIR}/stage2.bin of=$TARGET conv=notrunc bs=512 seek=1 >/dev/null
 
 #create loop device
-DEVICE=$( losetup -fP --show ${SOURCE_DIR}/${TARGET})
+DEVICE=$(losetup -fP --show ${TARGET})
 TARGET_PART="${DEVICE}p1"
 
 #create fs

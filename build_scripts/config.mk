@@ -20,7 +20,7 @@ export TARGET_LIBS =
 export SOURCE_DIR = $(abspath .)
 
 SRC_DIR = src
-export BUILD_DIR = build
+export BUILD_DIR = $(abspath build)
 ASM_INCLUDES := $(SRC_DIR)/utils/asm/
 
 BINUTILS_VER = 2.37
