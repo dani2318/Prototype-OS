@@ -65,17 +65,21 @@ def find_symbol_in_map_file(map_file: str, symbol: str):
                     return int(match.group(1), base=16)
     return None
 
-def install_stage1(target: str, stage1: str, offset=0):
+def install_stage1(target: str, stage1: str,stage2_offset,stage2_size, offset=0):
     # find stage1 map file
     map_file = Path(stage1).with_suffix('.map')
     if not map_file.exists():
-        raise ValueError("Can't find " + map_file)
+        raise ValueError("Can't find " + str(map_file))
 
     entry_offset = find_symbol_in_map_file(map_file, '__entry_start')
     if entry_offset is None:
         raise ValueError("Can't find __entry_start symbol in map file " + str(map_file))
     entry_offset -= 0x7c00
 
+    stage2_start = find_symbol_in_map_file(map_file, 'stage2_location')
+    if stage2_start is None:
+        raise ValueError("Can't find __entry_start symbol in map file " + str(map_file))
+    stage2_start -= 0x7c00
 
 
     with open(stage1, 'rb') as fstage1:
@@ -91,7 +95,9 @@ def install_stage1(target: str, stage1: str, offset=0):
             ftarget.write(fstage1.read())
 
             # write location of stage2
-
+            ftarget.seek(offset * SECTOR_SIZE + stage2_start, SEEK_SET)
+            ftarget.write(stage2_offset.to_bytes(4, byteorder='little'))
+            ftarget.write(stage2_size.to_bytes(1,byteorder='little'))
 
 
 
@@ -112,7 +118,7 @@ def build_floppy(image, stage1, stage2, kernel, files, env):
   create_filesystem(image, 'fat12', stage2_sectors)
 
   print(f"> installing stage1...")
-  install_stage1(image,stage1)
+  install_stage1(image,stage1,stage2_offset=1,stage2_size=stage2_sectors)
 
   print(f"> installing stage2...")
   install_stage2(image,stage2, offset=1)
@@ -176,7 +182,7 @@ def build_disk(image, stage1, stage2, kernel, files, env):
 
     # install stage1
     print(f"> installing stage1...")
-    install_stage1(image, stage1, offset=partition_offset)
+    install_stage1(image, stage1, offset=partition_offset,stage2_offset=1,stage2_size=stage2_sectors)
 
     # install stage2
     print(f"> installing stage2...")

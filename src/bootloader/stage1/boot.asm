@@ -309,6 +309,7 @@ section .data
     STAGE2_LOAD_OFFSET      equ 0x500
 
 section .data
+    global stage2_location
     stage2_location:        times 30 db 0
 
 section .bss
