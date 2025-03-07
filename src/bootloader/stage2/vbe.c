@@ -1,7 +1,10 @@
 #include "vbe.h"
 #include "x86.h"
 #include "stdio.h"
-#include "memory.h"
+
+#define SEG(segoff) (segoff >> 16)
+#define OFF(segoff) (segoff & 0xFFFF)
+#define SEGOFF2LIN(segoff) ((SEG(segoff) << 4 ) + OFF(segoff))
 
 bool VBE_GetControllerInfo(VbeInfoBlock* info){
 

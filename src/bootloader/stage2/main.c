@@ -3,6 +3,7 @@
 #include "x86.h"
 #include "disk.h"
 #include "vbe.h"
+#include "mbr.h"
 #include "fat.h"
 #include "memdefs.h"
 #include "memory.h"
@@ -14,7 +15,7 @@ uint8_t* Kernel = (uint8_t*)MEMORY_KERNEL_ADDR;
 
 typedef void (*KernelStart)();
 
-void __attribute__((cdecl)) start(uint16_t bootDrive){
+void __attribute__((cdecl)) start(uint16_t bootDrive, void* partition){
   clscr();
 
   uint8_t driveType;
@@ -28,18 +29,22 @@ void __attribute__((cdecl)) start(uint16_t bootDrive){
     goto end;
   }
 
-  if(!FAT_Initialize(&disk)){
+  Partition part;
+
+  MBR_DetectPartiton(&part,&disk,partition);
+
+  if(!FAT_Initialize(&part)){
     printf("FAT: init error \r\n");
     goto end;
   }
 
   // load kernel
-  FAT_File * fd = FAT_Open(&disk, "/oskrnl.bin");
+  FAT_File * fd = FAT_Open(&part, "/oskrnl.bin");
   uint32_t read;
 
   uint8_t* kernelbuffer = Kernel;
 
-  while ((read = FAT_Read(&disk, fd, MEMORY_LOAD_SIZE,KernelLoadBuffer)))
+  while ((read = FAT_Read(&part, fd, MEMORY_LOAD_SIZE,KernelLoadBuffer)))
   {
     memcpy(kernelbuffer,KernelLoadBuffer, read);
     kernelbuffer += read;

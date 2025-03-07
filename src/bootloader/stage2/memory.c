@@ -33,3 +33,12 @@ int memcmp(const void * ptr1, const void * ptr2, uint16_t num)
 
     return 0;
 }
+
+
+void* so_addr_to_lin(void* addr){
+
+  uint32_t offset = ((uint32_t)(addr) & 0xFFFF);
+  uint32_t segment = ((uint32_t)(addr) >> 16);
+
+  return (void*)(segment * 16 + offset);
+}

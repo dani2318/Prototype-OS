@@ -4,7 +4,13 @@
     "stdio.h": "c",
     "stdint.h": "c",
     "disk.h": "c",
-    "x86.h": "c"
+    "x86.h": "c",
+    "testing.h": "c",
+    "fat12_test.h": "c",
+    "memory.h": "c",
+    "minmax.h": "c",
+    "fat.h": "c",
+    "memdefs.h": "c"
   },
   "python.analysis.autoImportCompletions": false,
   "python.analysis.typeCheckingMode": "standard"
