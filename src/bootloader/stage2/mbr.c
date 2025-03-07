@@ -15,7 +15,7 @@ typedef struct
 
 
 void MBR_DetectPartiton(Partition* part,DISK* disk, void* partition){
-
+  part->disk = disk;
   if(disk->id < 0x80){
     part->partitionOffset =  0;
     part->partitionSize = (uint32_t)(disk->cylinders) * (uint32_t)(disk->heads) * (uint32_t)(disk->sectors);
@@ -23,6 +23,7 @@ void MBR_DetectPartiton(Partition* part,DISK* disk, void* partition){
     MBR_Entry* entry = (MBR_Entry*) so_addr_to_lin(partition);
     part->partitionOffset = entry->lbaStart;
     part->partitionSize = entry->size;
+
     printf("============== MBR INFO ==============\r\n");
     printf("attributes=%x\r\n",entry->attributes);
     printf("lbaStart=%x\r\n",entry->lbaStart);
@@ -33,5 +34,6 @@ void MBR_DetectPartiton(Partition* part,DISK* disk, void* partition){
 }
 
 bool Partition_ReadSectors(Partition* part, uint32_t lba, uint8_t sectors, void * lowerdataOut){
+  printf("lba=%x sectors=%x\r\n",lba,sectors);
   return DISK_ReadSectors(part->disk, lba + part->partitionOffset, sectors, lowerdataOut);
 }

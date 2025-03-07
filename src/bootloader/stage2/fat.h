@@ -36,6 +36,12 @@ typedef struct{
   uint32_t Size;
 } FAT_File;
 
+enum FAT_TYPE {
+  FAT_12 = 12,
+  FAT_16 = 16,
+  FAT_32 = 32
+};
+
 enum FAT_Attributes
 {
   FAT_ATTRIBUTE_READ_ONLY               = 0x01,
