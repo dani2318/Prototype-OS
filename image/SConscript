@@ -91,9 +91,7 @@ def install_stage1(target: str, stage1: str, offset=0):
             ftarget.write(fstage1.read())
 
             # write location of stage2
-            ftarget.seek(offset * SECTOR_SIZE + stage2_start, SEEK_SET)
-            ftarget.write(stage2_offset.to_bytes(4, byteorder='little'))
-            ftarget.write(stage2_size.to_bytes(1, byteorder='little'))
+
 
 
 
@@ -178,7 +176,7 @@ def build_disk(image, stage1, stage2, kernel, files, env):
 
     # install stage1
     print(f"> installing stage1...")
-    install_stage1(image, stage1, offset=partition_offset, stage2_offset=1, stage2_size=stage2_sectors)
+    install_stage1(image, stage1, offset=partition_offset)
 
     # install stage2
     print(f"> installing stage2...")

@@ -37,6 +37,7 @@ section .fsheaders
     ebr_system_id:              db 'FAT12   '         ; 8 bytes, padded with spaces
 
 section .entry
+    global start
     start:
         ; setup data segments
         mov ax, 0           ; can't set ds/es directly
