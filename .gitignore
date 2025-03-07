@@ -1,4 +1,10 @@
 toolchain/*
 build/*
-
+image/*.img
+build_scripts/__pycache__/*
+build_scripts/__pycache__
 *.err
+bochs_conf
+bochs_config
+bx_enh_dbg.ini
+.sconsign.dblite
