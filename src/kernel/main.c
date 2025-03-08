@@ -15,7 +15,7 @@ void start(uint16_t bootDrive){
 
   _init(); // call global constr.
 
-  clscr();
+  //clscr();
 
   printf("============       oskrnl loading!       ============\n");
   HAL_Initialize();
