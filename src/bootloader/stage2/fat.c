@@ -243,8 +243,6 @@ uint32_t FAT_NextCluster(Partition* disk, uint32_t currentCluster)
     // Make sure cache has the right number
     uint32_t fatIndexSector = fatIndex / SECTOR_SIZE;
 
-    printf("g_Data->FatCachePosition: %x\r\n",g_Data->FatCachePosition);
-
     if(fatIndexSector < g_Data->FatCachePosition || fatIndexSector >= g_Data->FatCachePosition + FAT_CACHE_SIZE){
         FAT_ReadFat(disk, fatIndexSector);
         g_Data->FatCachePosition = fatIndexSector;
