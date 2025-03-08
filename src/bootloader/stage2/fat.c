@@ -408,33 +408,35 @@ bool FAT_FindFile(Partition* disk, FAT_File * file, const char* name, FAT_Direct
 
     while (FAT_ReadEntry(disk, file, &entry))
     {
-        if(entry.Attributes == FAT_ATTRIBUTE_LFN){
-            FAT_LongFileEntry* lfn = (FAT_LongFileEntry*) &entry;
-            int idx =g_Data->LFNCount++;
-            g_Data->LFNBlock[idx].order = lfn->Order & (FAT_LFN_LAST - 1);
-            memcpy(g_Data->LFNBlock[idx].chars, lfn->Chars1, sizeof(lfn->Chars1));
-            memcpy(g_Data->LFNBlock[idx].chars + 5, lfn->Chars2, sizeof(lfn->Chars2));
-            memcpy(g_Data->LFNBlock[idx].chars + 11, lfn->Chars3, sizeof(lfn->Chars3));
+        // if(entry.Attributes == FAT_ATTRIBUTE_LFN){
+        //     FAT_LongFileEntry* lfn = (FAT_LongFileEntry*) &entry;
+        //     int idx =g_Data->LFNCount++;
+        //     g_Data->LFNBlock[idx].order = lfn->Order & (FAT_LFN_LAST - 1);
+        //     memcpy(g_Data->LFNBlock[idx].chars, lfn->Chars1, sizeof(lfn->Chars1));
+        //     memcpy(g_Data->LFNBlock[idx].chars + 5, lfn->Chars2, sizeof(lfn->Chars2));
+        //     memcpy(g_Data->LFNBlock[idx].chars + 11, lfn->Chars3, sizeof(lfn->Chars3));
 
-            // check if last lFN block
+        //     // check if last lFN block
 
-            if(lfn->Order & FAT_LFN_LAST != 0){
-                char* namePos = longName;
-                qsort(g_Data->LFNBlock, g_Data->LFNCount, sizeof(FAT_LFNBlock),FAT_CompareLFNBlocks);
-                for(int i = 0; i < g_Data->LFNCount; i++){
-                    int16_t* chars = g_Data->LFNBlock[i].chars;
-                    int16_t* charslimit = chars + 13;
-                    while(chars < charslimit && *chars != 0){
-                        int codepoint;
-                        chars = utf16_to_codepoint(chars,&codepoint);
-                        namePos = codepoint_to_utf8(codepoint,namePos);
-                    }
-                }
-                *namePos = 0;
-                printf("LFN: %s\r\n", longName);
-            }
-        }
-
+        //     if(lfn->Order & FAT_LFN_LAST != 0){
+        //         char* namePos = longName;
+        //         qsort(g_Data->LFNBlock, g_Data->LFNCount, sizeof(FAT_LFNBlock),FAT_CompareLFNBlocks);
+        //         for(int i = 0; i < g_Data->LFNCount; i++){
+        //             int16_t* chars = g_Data->LFNBlock[i].chars;
+        //             int16_t* charslimit = chars + 13;
+        //             while(chars < charslimit && *chars != 0){
+        //                 int codepoint;
+        //                 chars = utf16_to_codepoint(chars,&codepoint);
+        //                 namePos = codepoint_to_utf8(codepoint,namePos);
+        //             }
+        //         }
+        //         *namePos = 0;
+        //         printf("LFN: %s\r\n", longName);
+        //     }
+        // }
+        printf("Entry name: %s\r\n",entry.Name);
+        printf("Entry found? %d\r\n",memcmp(shortName, entry.Name, 11));
+        printf("Param name: %s\r\n",name);
         if (memcmp(shortName, entry.Name, 11) == 0)
         {
             *entryOut = entry;
@@ -454,6 +456,7 @@ FAT_File * FAT_Open(Partition* disk, const char* path)
         path++;
 
     FAT_File * current = &g_Data->RootDirectory.Public;
+    printf("Param path: %s\r\n",path);
 
     while (*path) {
         // extract next file name from path

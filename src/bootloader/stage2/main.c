@@ -4,6 +4,7 @@
 #include "disk.h"
 #include "vbe.h"
 #include "mbr.h"
+#include "elf.h"
 #include "fat.h"
 #include "memdefs.h"
 #include "memory.h"
@@ -38,19 +39,14 @@ void __attribute__((cdecl)) start(uint16_t bootDrive, void* partition){
     printf("FAT: init error \r\n");
     goto end;
   }
+  KernelStart kernelEntry;
 
   // load kernel
-  FAT_File * fd = FAT_Open(&part, "/boot/oskrnl.bin");
-  uint32_t read;
-
-  uint8_t* kernelbuffer = Kernel;
-
-  while ((read = FAT_Read(&part, fd, MEMORY_LOAD_SIZE,KernelLoadBuffer)))
-  {
-    memcpy(kernelbuffer,KernelLoadBuffer, read);
-    kernelbuffer += read;
+  if(!ELF_Read(&part,"/boot/oskrnl.elf",(void**)&kernelEntry)){
+    printf("Can't find /boot/oskrnl.bin!, boot halted!\r\n");
+    goto end;
   }
-  FAT_Close(fd);
+  printf("Result ELF read: %x", kernelEntry);
 
 
   // uint16_t pickedMode = 0xffff;
@@ -94,8 +90,7 @@ void __attribute__((cdecl)) start(uint16_t bootDrive, void* partition){
 
 
   // exec kernel
-  KernelStart kernelstart = (KernelStart)Kernel;
-  kernelstart();
+  kernelEntry(&bootDrive);
 
 end:
   for(;;);

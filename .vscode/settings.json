@@ -16,7 +16,13 @@
     "bitfield3.C": "cpp",
     "nullptr1.C": "cpp",
     "pr81194.C": "cpp",
-    "stdlib.h": "c"
+    "stdlib.h": "c",
+    "*.inc": "c",
+    "*.tcc": "c",
+    "buffer": "c",
+    "pr77550.C": "cpp",
+    "mbr.h": "c",
+    "elf.h": "c"
   },
   "python.analysis.autoImportCompletions": false,
   "python.analysis.typeCheckingMode": "standard"

@@ -36,6 +36,6 @@ objects = [
     obj_crtn
 ]
 
-kernel = env.Program('oskrnl.bin', objects)
+kernel = env.Program('oskrnl.elf', objects)
 
 Export('kernel')
