@@ -1,15 +1,10 @@
 #pragma once
-
 #include <stdint.h>
+#include "stdio.h"
+#include "disk.h"
 #include <stddef.h>
 
-#include "stdio.h"
-#include "mbr.h"
-#include "memdefs.h"
-#include "string.h"
-#include "memory.h"
-#include "ctype.h"
-#include "minmax.h"
+
 
 
 typedef struct
@@ -36,12 +31,6 @@ typedef struct{
   uint32_t Size;
 } FAT_File;
 
-enum FAT_TYPE {
-  FAT12 = 12,
-  FAT16 = 16,
-  FAT32 = 32
-};
-
 enum FAT_Attributes
 {
   FAT_ATTRIBUTE_READ_ONLY               = 0x01,
@@ -53,8 +42,8 @@ enum FAT_Attributes
   FAT_ATTRIBUTE_LFN                     = FAT_ATTRIBUTE_READ_ONLY | FAT_ATTRIBUTE_HIDDEN | FAT_ATTRIBUTE_SYSTEM | FAT_ATTRIBUTE_VOLUME_ID
 };
 
-bool FAT_Initialize(Partition* disk);
-FAT_File * FAT_Open(Partition* disk, const char* path);
-uint32_t FAT_Read(Partition* disk, FAT_File * file, uint32_t byteCount, void* dataOut);
-bool FAT_ReadEntry(Partition* disk, FAT_File * file, FAT_DirectoryEntry* dirEntry);
+bool FAT_Initialize(DISK* disk);
+FAT_File * FAT_Open(DISK* disk, const char* path);
+uint32_t FAT_Read(DISK* disk, FAT_File * file, uint32_t byteCount, void* dataOut);
+bool FAT_ReadEntry(DISK* disk, FAT_File * file, FAT_DirectoryEntry* dirEntry);
 void FAT_Close(FAT_File * file);

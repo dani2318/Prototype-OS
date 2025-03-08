@@ -2,6 +2,11 @@ bits 16
 
 %define ENDL 0x0D, 0x0A
 
+%define fat12 1
+%define fat16 2
+%define fat32 3
+%define ext2  4
+
 ;
 ; FAT12 header
 ;
@@ -11,6 +16,8 @@ section .fsjump
     nop
 
 section .fsheaders
+
+%if (FILESYSTEM == fat12) || (FILESYSTEM == fat16) || (FILESYSTEM == fat32)
     bdb_oem:                    db 'MSWIN4.1'         ; 8 bytes
     bdb_bytes_per_sector:       dw 512
     bdb_sectors_per_cluser:     db 1
@@ -29,6 +36,17 @@ section .fsheaders
     ; Extended boot record
     ;
 
+    %if (FILESYSTEM == fat32)
+
+        fat32_sectors_per_fat:           dd 0
+        fat32_flags:                     dw 0
+        fat32_fat_version_number:        dw 0
+        fat32_rootdir_cluster:           dd 0
+        fat32_fsinfo_sector:             dw 0
+        fat32_backup_boot_sector:        dw 0
+        fat32_reserved:                  times 12 db 0
+    %endif
+
     ebr_drive_number:           db 0
                                 db 0
     ebr_signature:              db 29h
@@ -36,9 +54,20 @@ section .fsheaders
     ebr_volume_label:           db 'PROT     OS'      ; 11 bytes, padded with spaces
     ebr_system_id:              db 'FAT12   '         ; 8 bytes, padded with spaces
 
+%endif
+
 section .entry
     global start
     start:
+        ; move part entry from MBR to different location so we
+        ; do not override it (passed through DS:SI)
+        mov ax, PARTITION_ENTRY_SEGMENT
+        mov es,ax
+        mov di, PARTITION_ENTRY_OFFSET
+
+        mov cx, 16
+        rep movsb
+
         ; setup data segments
         mov ax, 0           ; can't set ds/es directly
         mov ds, ax
@@ -59,10 +88,6 @@ section .entry
         ; read something from floppy disk
         ; BIOS should set DL to drive number
         mov [ebr_drive_number], dl
-
-        ; show loading message
-        mov si, msg_loading
-        call puts
 
         ;check exts
         mov ah, 0x41
@@ -115,6 +140,8 @@ section .entry
 
         ; jump to our kernel
         mov dl, [ebr_drive_number]          ; boot device in dl
+        mov si, PARTITION_ENTRY_OFFSET
+        mov di, PARTITION_ENTRY_SEGMENT
 
         mov ax, STAGE2_LOAD_SEGMENT         ; set segment registers
         mov ds, ax
@@ -291,8 +318,7 @@ section .text
 section .rodata
     msg_read_failed:      db 'Disk read failed!', ENDL, 0
 
-    msg_loading:            db 'Loading...', ENDL, 0
-    msg_stage2_not_found:   db 'STAGE2.BIN file not found!', ENDL, 0
+    msg_stage2_not_found:   db 'STAGE2.BIN not found!', ENDL, 0
     file_stage2_bin:        db 'STAGE2  BIN'
 
 section .data
@@ -305,8 +331,12 @@ section .data
         .segment:           dw 0
         .lba:               dq 0
 
+
     STAGE2_LOAD_SEGMENT     equ 0x0
     STAGE2_LOAD_OFFSET      equ 0x500
+
+    PARTITION_ENTRY_SEGMENT equ 0x2000
+    PARTITION_ENTRY_OFFSET  equ 0x0
 
 section .data
     global stage2_location

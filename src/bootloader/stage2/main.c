@@ -3,6 +3,7 @@
 #include "x86.h"
 #include "disk.h"
 #include "vbe.h"
+#include "mbr.h"
 #include "fat.h"
 #include "memdefs.h"
 #include "memory.h"
@@ -14,7 +15,7 @@ uint8_t* Kernel = (uint8_t*)MEMORY_KERNEL_ADDR;
 
 typedef void (*KernelStart)();
 
-void __attribute__((cdecl)) start(uint16_t bootDrive){
+void __attribute__((cdecl)) start(uint16_t bootDrive, void* partition){
   clscr();
 
   uint8_t driveType;
@@ -28,18 +29,21 @@ void __attribute__((cdecl)) start(uint16_t bootDrive){
     goto end;
   }
 
-  if(!FAT_Initialize(&disk)){
+  Partition part;
+  MBR_DetectPartiton(&part,&disk,partition);
+
+  if(!FAT_Initialize(&part)){
     printf("FAT: init error \r\n");
     goto end;
   }
 
   // load kernel
-  FAT_File * fd = FAT_Open(&disk, "/oskrnl.bin");
+  FAT_File * fd = FAT_Open(&part, "/boot/oskrnl.bin");
   uint32_t read;
 
   uint8_t* kernelbuffer = Kernel;
 
-  while ((read = FAT_Read(&disk, fd, MEMORY_LOAD_SIZE,KernelLoadBuffer)))
+  while ((read = FAT_Read(&part, fd, MEMORY_LOAD_SIZE,KernelLoadBuffer)))
   {
     memcpy(kernelbuffer,KernelLoadBuffer, read);
     kernelbuffer += read;
@@ -47,43 +51,43 @@ void __attribute__((cdecl)) start(uint16_t bootDrive){
   FAT_Close(fd);
 
 
-  uint16_t pickedMode = 0xffff;
-  uint32_t* fb = NULL;
-  const int desiderWidth = 800;
-  const int desiderHeight = 600;
-  const int desiderBPP = 32;
+  // uint16_t pickedMode = 0xffff;
+  // uint32_t* fb = NULL;
+  // const int desiderWidth = 800;
+  // const int desiderHeight = 600;
+  // const int desiderBPP = 32;
 
-  VbeInfoBlock* info = (VbeInfoBlock*)MEMORY_VESA_INFO;
-  VbeModeInfo* modeinfo = (VbeModeInfo*)MEMORY_MODE_INFO;
-  // Init graphics
-  if(VBE_GetControllerInfo(info)){
-    uint16_t* mode = (uint16_t*) info->VideoModePtr;
+  // VbeInfoBlock* info = (VbeInfoBlock*)MEMORY_VESA_INFO;
+  // VbeModeInfo* modeinfo = (VbeModeInfo*)MEMORY_MODE_INFO;
+  // // Init graphics
+  // if(VBE_GetControllerInfo(info)){
+  //   uint16_t* mode = (uint16_t*) info->VideoModePtr;
 
-    for(int i = 0;mode[i] != 0xFFFF; i++){
-      if(!VBE_GetModeInfo(mode[i],modeinfo)){
-        printf("Can't get mode info %x\r\n",mode[i]);
-        continue;
-      }
-      printf("mode res: (%dx%d),",modeinfo->width, modeinfo->height);
+  //   for(int i = 0;mode[i] != 0xFFFF; i++){
+  //     if(!VBE_GetModeInfo(mode[i],modeinfo)){
+  //       printf("Can't get mode info %x\r\n",mode[i]);
+  //       continue;
+  //     }
+  //     //printf("mode res: (%dx%d),",modeinfo->width, modeinfo->height);
 
-      bool hasFB = (modeinfo->attributes & 0x90) == 0x90;
+  //     bool hasFB = (modeinfo->attributes & 0x90) == 0x90;
 
-      if( hasFB &&
-          modeinfo->width == desiderWidth &&
-          modeinfo->height == desiderHeight &&
-          modeinfo->bpp == desiderBPP ){
+  //     if( hasFB &&
+  //         modeinfo->width == desiderWidth &&
+  //         modeinfo->height == desiderHeight &&
+  //         modeinfo->bpp == desiderBPP ){
 
-          pickedMode = mode[i];
-          break;
+  //         pickedMode = mode[i];
+  //         break;
 
-      }
-    }
-    if(pickedMode != 0xFFFF) { // && VBE_SetMode(pickedMode) ! NOTE: TO ENABLE VBE ADD THIS TO THE IF CONDITION! (FOR NOW IT'S DISABLED)
-      fb = (uint32_t*)(modeinfo->framebuffer);
-    }
-  }else{
-    printf("No VBE extensions.\r\n");
-  }
+  //     }
+  //   }
+  //   if(pickedMode != 0xFFFF) { // && VBE_SetMode(pickedMode) ! NOTE: TO ENABLE VBE ADD THIS TO THE IF CONDITION! (FOR NOW IT'S DISABLED)
+  //     fb = (uint32_t*)(modeinfo->framebuffer);
+  //   }
+  // }else{
+  //   printf("No VBE extensions.\r\n");
+  // }
 
 
 
