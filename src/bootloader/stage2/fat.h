@@ -4,6 +4,7 @@
 #include <stddef.h>
 
 #include "stdio.h"
+#include "stdlib.h"
 #include "mbr.h"
 #include "memdefs.h"
 #include "string.h"
@@ -28,6 +29,21 @@ typedef struct
     uint32_t Size;
 } __attribute__((packed)) FAT_DirectoryEntry;
 
+#define FAT_LFN_LAST   0x40
+
+typedef struct
+{
+
+    uint8_t Order;
+    int16_t Chars1[5];
+    uint8_t Attribute;
+    uint8_t LongEntryType;
+    uint8_t Checksum;
+    int16_t Chars2[6];
+    uint16_t _AlwaysZero;
+    int16_t Chars3[2];
+
+} __attribute__((packed)) FAT_LongFileEntry;
 
 typedef struct{
   int handle;

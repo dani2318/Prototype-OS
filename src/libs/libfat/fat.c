@@ -345,6 +345,7 @@ FAT_File * FAT_Open(DISK* disk, const char* path)
 
         // find directory entry in current directory
         FAT_DirectoryEntry entry;
+        printf("FAT_Open found? %d\n\r",FAT_FindFile(disk, current, name, &entry));
         if (FAT_FindFile(disk, current, name, &entry))
         {
             FAT_Close(current);
