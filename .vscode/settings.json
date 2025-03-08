@@ -10,7 +10,8 @@
     "memory.h": "c",
     "minmax.h": "c",
     "fat.h": "c",
-    "memdefs.h": "c"
+    "memdefs.h": "c",
+    "io.h": "c"
   },
   "python.analysis.autoImportCompletions": false,
   "python.analysis.typeCheckingMode": "standard"

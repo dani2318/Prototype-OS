@@ -7,6 +7,27 @@
 #define ROOT_DIRECTORY_HANDLE   -1
 #define FAT_CACHE_SIZE          5
 
+typedef struct{
+    // extended boot record
+    uint8_t DriveNumber;
+    uint8_t _Reserved;
+    uint8_t Signature;
+    uint32_t VolumeId;          // serial number, value doesn't matter
+    uint8_t VolumeLabel[11];    // 11 bytes, padded with spaces
+    uint8_t SystemId[8];
+} __attribute__((packed)) FAT_ExtendedBootRecord;
+
+typedef struct{
+    // extended boot record
+    uint32_t sectorsPerFat;
+    uint16_t flags;
+    uint16_t fatVersionNumber;
+    uint32_t RootDirectoryCluster;
+    uint32_t FSinfoSector;
+    uint16_t BackupBootSector;
+    uint8_t _Reserved[12];
+    FAT_ExtendedBootRecord EBR;
+} __attribute__((packed)) FAT32_ExtendedBootRecord;
 
 typedef struct
 {
@@ -25,13 +46,11 @@ typedef struct
     uint32_t HiddenSectors;
     uint32_t LargeSectorCount;
 
-    // extended boot record
-    uint8_t DriveNumber;
-    uint8_t _Reserved;
-    uint8_t Signature;
-    uint32_t VolumeId;          // serial number, value doesn't matter
-    uint8_t VolumeLabel[11];    // 11 bytes, padded with spaces
-    uint8_t SystemId[8];
+    union{
+        FAT_ExtendedBootRecord EBR1216;
+        FAT32_ExtendedBootRecord EBR32;
+    };
+
 
     // ... we don't care about code ...
 
@@ -69,6 +88,8 @@ typedef struct
 static FAT_Data * g_Data;
 static uint32_t g_DataSectionLba;
 static uint8_t g_FatType;
+static uint32_t g_TotalSectors;
+static uint32_t g_SectorsPerFat;
 
 bool FAT_ReadBootSector(Partition* disk)
 {
@@ -82,16 +103,18 @@ bool FAT_ReadFat(Partition* disk,size_t index)
 
 void FAT_Detect(Partition* disk){
 
-    uint32_t dataClusters = (disk->partitionSize  - g_DataSectionLba) / g_Data->BS.BootSector.SectorsPerCluster;
+    uint32_t dataClusters = (g_TotalSectors  - g_DataSectionLba) / g_Data->BS.BootSector.SectorsPerCluster;
     if(dataClusters < 0xFF5){
-        g_FatType = FAT_12;
+        g_FatType = FAT12;
     }else if (g_Data->BS.BootSector.SectorsPerFat != 0){
-        g_FatType = FAT_16;
-    }else g_FatType = FAT_32;
-
+        g_FatType = FAT16;
+    }else g_FatType = FAT32;
 
 }
-
+uint32_t FAT_ClusterToLba(uint32_t cluster)
+{
+    return g_DataSectionLba + (cluster - 2) * g_Data->BS.BootSector.SectorsPerCluster;
+}
 bool FAT_Initialize(Partition* disk)
 {
     g_Data = (FAT_Data *)MEMORY_FAT_ADDR;
@@ -105,14 +128,36 @@ bool FAT_Initialize(Partition* disk)
 
     // read FAT
     g_Data->FatCachePosition = 0xFFFFFFFF;
-    printf("BS.BytePerSector:%u\r\n",g_Data->BS.BootSector.BytesPerSector);
-    printf("BS.SectorsPerFat:%u\r\n",g_Data->BS.BootSector.SectorsPerFat);
+
+    g_TotalSectors = g_Data->BS.BootSector.TotalSectors;
+    if(g_TotalSectors == 0){
+        // FAT32
+        g_TotalSectors = g_Data->BS.BootSector.LargeSectorCount;
+    }
+
+    bool isFat32 = false;
+    g_SectorsPerFat = g_Data->BS.BootSector.SectorsPerFat;
+    if(g_SectorsPerFat == 0){
+        // FAT32
+        isFat32 = true;
+        g_SectorsPerFat = g_Data->BS.BootSector.EBR32.sectorsPerFat;
+    }
+
 
     // open root directory file
-    uint32_t rootDirLba = g_Data->BS.BootSector.ReservedSectors + g_Data->BS.BootSector.SectorsPerFat * g_Data->BS.BootSector.FatCount;
-    uint32_t rootDirSize  = sizeof(FAT_DirectoryEntry) * g_Data->BS.BootSector.DirEntryCount;
-    uint32_t rootDirSectors = (rootDirSize + g_Data->BS.BootSector.BytesPerSector - 1) / g_Data->BS.BootSector.BytesPerSector;
-    g_DataSectionLba = rootDirLba + rootDirSectors;
+    uint32_t rootDirLba ;
+    uint32_t rootDirSize = 0;
+
+    if(isFat32){
+        g_DataSectionLba = g_Data->BS.BootSector.ReservedSectors + g_SectorsPerFat * g_Data->BS.BootSector.FatCount;
+        rootDirLba= FAT_ClusterToLba(g_Data->BS.BootSector.EBR32.RootDirectoryCluster);
+        rootDirSize = 0;
+    }else{
+        rootDirLba = g_Data->BS.BootSector.ReservedSectors + g_SectorsPerFat * g_Data->BS.BootSector.FatCount;
+        rootDirSize = sizeof(FAT_DirectoryEntry) * g_Data->BS.BootSector.DirEntryCount;
+        uint32_t rootDirSectors = (rootDirSize + g_Data->BS.BootSector.BytesPerSector - 1) / g_Data->BS.BootSector.BytesPerSector;
+        g_DataSectionLba = rootDirLba + rootDirSectors;
+    }
 
     g_Data->RootDirectory.Public.handle = ROOT_DIRECTORY_HANDLE;
     g_Data->RootDirectory.Public.isDirectory = true;
@@ -129,21 +174,18 @@ bool FAT_Initialize(Partition* disk)
         return false;
     }
 
-    // calculate data section
+    // Detect FAT type
     FAT_Detect(disk);
 
-
-    // reset opened files
+    // reset open files
     for (int i = 0; i < MAX_FILE_HANDLES; i++)
         g_Data->OpenedFiles[i].Opened = false;
+
 
     return true;
 }
 
-uint32_t FAT_ClusterToLba(uint32_t cluster)
-{
-    return g_DataSectionLba + (cluster - 2) * g_Data->BS.BootSector.SectorsPerCluster;
-}
+
 
 FAT_File * FAT_OpenEntry(Partition* disk, FAT_DirectoryEntry* entry)
 {
@@ -191,24 +233,27 @@ uint32_t FAT_NextCluster(Partition* disk, uint32_t currentCluster)
 {
     // Determine the byte offset of the entry we need to read!
     uint32_t fatIndex;
-    if(g_FatType == FAT_12)
+    if(g_FatType == FAT12)
         fatIndex = currentCluster * 3 / 2;
-    else if (g_FatType == FAT_16)
+    else if (g_FatType == FAT16)
         fatIndex = currentCluster * 2;
-    else if (g_FatType == FAT_32)
+    else if (g_FatType == FAT32)
         fatIndex = currentCluster * 4;
 
     // Make sure cache has the right number
     uint32_t fatIndexSector = fatIndex / SECTOR_SIZE;
 
+    printf("g_Data->FatCachePosition: %x\r\n",g_Data->FatCachePosition);
+
     if(fatIndexSector < g_Data->FatCachePosition || fatIndexSector >= g_Data->FatCachePosition + FAT_CACHE_SIZE){
         FAT_ReadFat(disk, fatIndexSector);
+        g_Data->FatCachePosition = fatIndexSector;
     }
 
     fatIndex -= (g_Data->FatCachePosition * SECTOR_SIZE);
 
     uint32_t nextCluster;
-    if(g_FatType == FAT_12){
+    if(g_FatType == FAT12){
         if (currentCluster % 2 == 0)
             nextCluster = (*(uint16_t *)(g_Data->FatCache + fatIndex)) & 0x0FFF;
         else
@@ -218,13 +263,13 @@ uint32_t FAT_NextCluster(Partition* disk, uint32_t currentCluster)
             nextCluster |= 0xFFFFF000;
         }
     }
-    else if (g_FatType == FAT_16){
+    else if (g_FatType == FAT16){
         nextCluster = *(uint16_t *)(g_Data->FatCache + fatIndex);
 
         if(nextCluster >= 0xFFF8){
             nextCluster |= 0xFFFF0000;
         }
-    }else if (g_FatType == FAT_32){
+    }else if (g_FatType == FAT32){
         nextCluster = *(uint32_t *)(g_Data->FatCache + fatIndex);
     }
 

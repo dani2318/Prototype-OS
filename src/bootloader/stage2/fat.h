@@ -37,9 +37,9 @@ typedef struct{
 } FAT_File;
 
 enum FAT_TYPE {
-  FAT_12 = 12,
-  FAT_16 = 16,
-  FAT_32 = 32
+  FAT12 = 12,
+  FAT16 = 16,
+  FAT32 = 32
 };
 
 enum FAT_Attributes
