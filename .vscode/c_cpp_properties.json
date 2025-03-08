@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/src/kernel/**",
+                "${workspaceFolder}/src/libs/core/**",
                 "${workspaceFolder}/src/bootloader/stage1/**",
                 "${workspaceFolder}/src/bootloader/stage2/**",
                 "${workspaceFolder}/toolchain/i686-elf/lib/gcc/i686-elf/11.2.0/include"
@@ -18,8 +19,7 @@
                 "-std=c99",
                 "-ffreestanding",
                 "-nostdlib"
-            ],
-
+            ]
         }
     ],
     "version": 4
