@@ -24,16 +24,9 @@ void MBR_DetectPartiton(Partition* part,DISK* disk, void* partition){
     part->partitionOffset = entry->lbaStart;
     part->partitionSize = entry->size;
 
-    printf("============== MBR INFO ==============\r\n");
-    printf("attributes=%x\r\n",entry->attributes);
-    printf("lbaStart=%x\r\n",entry->lbaStart);
-    printf("partitionType=%x\r\n",entry->partitionType);
-    printf("size=%x\r\n",entry->size);
-    printf("============== MBR INFO ==============\r\n");
   }
 }
 
 bool Partition_ReadSectors(Partition* part, uint32_t lba, uint8_t sectors, void * lowerdataOut){
-  printf("lba=%x sectors=%x\r\n",lba,sectors);
   return DISK_ReadSectors(part->disk, lba + part->partitionOffset, sectors, lowerdataOut);
 }

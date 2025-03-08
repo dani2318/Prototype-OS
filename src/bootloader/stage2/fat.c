@@ -273,11 +273,6 @@ uint32_t FAT_NextCluster(Partition* disk, uint32_t currentCluster)
         nextCluster = *(uint32_t *)(g_Data->FatCache + fatIndex);
     }
 
-    printf("fatindex=%x \n",fatIndex);
-    printf("fatIndexSector=%x \n",fatIndexSector);
-    printf("g_FatType=%d \n",g_FatType);
-    printf("nextCluster=%x \n",nextCluster);
-
     return nextCluster;
 }
 
