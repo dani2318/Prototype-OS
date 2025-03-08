@@ -15,6 +15,8 @@ uint8_t* Kernel = (uint8_t*)MEMORY_KERNEL_ADDR;
 
 typedef void (*KernelStart)();
 
+
+
 void __attribute__((cdecl)) start(uint16_t bootDrive, void* partition){
   clscr();
 

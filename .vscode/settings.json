@@ -11,7 +11,12 @@
     "minmax.h": "c",
     "fat.h": "c",
     "memdefs.h": "c",
-    "io.h": "c"
+    "io.h": "c",
+    "random": "c",
+    "bitfield3.C": "cpp",
+    "nullptr1.C": "cpp",
+    "pr81194.C": "cpp",
+    "stdlib.h": "c"
   },
   "python.analysis.autoImportCompletions": false,
   "python.analysis.typeCheckingMode": "standard"
