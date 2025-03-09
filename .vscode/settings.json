@@ -44,7 +44,9 @@
     "dynamic_bitset": "c",
     "initializer_list": "c",
     "vga_text.h": "c",
-    "*.x": "cpp"
+    "*.x": "cpp",
+    "limits": "cpp",
+    "chrono": "cpp"
   },
   "python.analysis.autoImportCompletions": false,
   "python.analysis.typeCheckingMode": "standard"
