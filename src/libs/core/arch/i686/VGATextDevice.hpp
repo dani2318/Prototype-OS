@@ -1,5 +1,5 @@
 #pragma once
-#include <dev/CharacterDevice.hpp>
+#include <core/dev/CharacterDevice.hpp>
 #include <stdint.h>
 #include "IO.hpp"
 namespace arch
@@ -14,8 +14,8 @@ namespace arch
       public:
         VGATextDevice();
         ~VGATextDevice() {};
-        virtual size_t Read(uint8_t* data, size_t size);
-        virtual size_t Write(const uint8_t* data, size_t size);
+        virtual size_t Read(uint8_t* data, size_t size) override;
+        virtual size_t Write(const uint8_t* data, size_t size) override;
 
         void Clear();
       private:

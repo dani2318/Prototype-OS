@@ -1,6 +1,6 @@
 #pragma once
 #include <stdarg.h>
-#include <dev/CharacterDevice.hpp>
+#include "CharacterDevice.hpp"
 #include "../cpp/TypeTraits.hpp"
 
 enum class FormatState

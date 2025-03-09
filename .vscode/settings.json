@@ -17,7 +17,7 @@
     "nullptr1.C": "cpp",
     "pr81194.C": "cpp",
     "stdlib.h": "c",
-    "*.inc": "c",
+    "*.inc": "asm-intel-x86-generic",
     "*.tcc": "c",
     "buffer": "c",
     "pr77550.C": "cpp",
@@ -46,7 +46,9 @@
     "vga_text.h": "c",
     "*.x": "cpp",
     "limits": "cpp",
-    "chrono": "cpp"
+    "chrono": "cpp",
+    "pr82027_0.C": "cpp",
+    "inherit1.C": "cpp"
   },
   "python.analysis.autoImportCompletions": false,
   "python.analysis.typeCheckingMode": "standard"

@@ -15,3 +15,9 @@ InB:
   xor eax, eax
   in al, dx
   ret
+
+
+global Panic
+Panic:
+  cli
+  hlt

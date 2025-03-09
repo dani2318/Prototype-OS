@@ -1,5 +1,6 @@
 #!/bin/bash
-
+echo "TO BE FIXED!!!!"
+exit
 BINUTILS_VERSION="${BINUTILS_VERSION:-2.37}"
 GCC_VERSION="${GCC_VERSION:-11.2.0}"
 
