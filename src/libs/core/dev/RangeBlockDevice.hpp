@@ -3,7 +3,7 @@
 
 class RangeBlockDevice: public BlockDevice{
 public:
-  RangeBlockDevice(BlockDevice* device, size_t rangeBegin, size_t rangeSize);
+  RangeBlockDevice();
   void Initialize(BlockDevice* device, size_t rangeBegin, size_t rangeSize);
   virtual void Seek(SeekPos pos, int rel) override;
   virtual size_t Size() override;

@@ -2,18 +2,18 @@
 #include <core/cpp/Algorithm.hpp>
 
 
-RangeBlockDevice::RangeBlockDevice(BlockDevice* device, size_t rangeBegin, size_t rangeSize)
+RangeBlockDevice::RangeBlockDevice()
   : m_device(nullptr),
     m_rangeBegin(0),
     m_rangeSize(0)
 {
-  m_device->Seek(SeekPos::Set,rangeBegin);
 }
 
 void RangeBlockDevice::Initialize(BlockDevice* device, size_t rangeBegin, size_t rangeSize){
   m_device = device;
   m_rangeBegin = rangeBegin;
   m_rangeSize = rangeSize;
+  m_device->Seek(SeekPos::Set,rangeBegin);
 }
 
 

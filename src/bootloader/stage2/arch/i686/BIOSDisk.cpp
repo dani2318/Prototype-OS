@@ -81,7 +81,7 @@ bool BIOSDisk::ReadNextSector(){
     params.ParamsSize = sizeof(ExtendedDriveParameters);
     params.Count = 1;
     params.lba = lba;
-    params.Buffer = ToSegOffset(m_Buffer);
+    params.Buffer = arch::i686::ToSegOffset(m_Buffer);
 
     for(int i = 0; i < 3; i++)
     {
