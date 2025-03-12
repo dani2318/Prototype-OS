@@ -1,5 +1,40 @@
 #pragma once
 #include <stdint.h>
+constexpr int SectorSize                =   512;
+
+struct FAT_LongFileEntry
+{
+
+  uint8_t Order;
+  int16_t Chars1[5];
+  uint8_t Attribute;
+  uint8_t LongEntryType;
+  uint8_t Checksum;
+  int16_t Chars2[6];
+  uint16_t _AlwaysZero;
+  int16_t Chars3[2];
+
+} __attribute__((packed));
+
+
+
+enum FAT_TYPE
+{
+  FAT12 = 12,
+  FAT16 = 16,
+  FAT32 = 32
+};
+
+enum FAT_Attributes
+{
+  FAT_ATTRIBUTE_READ_ONLY = 0x01,
+  FAT_ATTRIBUTE_HIDDEN = 0x02,
+  FAT_ATTRIBUTE_SYSTEM = 0x04,
+  FAT_ATTRIBUTE_VOLUME_ID = 0x08,
+  FAT_ATTRIBUTE_DIRECTORY = 0x10,
+  FAT_ATTRIBUTE_ARCHIVE = 0x20,
+  FAT_ATTRIBUTE_LFN = FAT_ATTRIBUTE_READ_ONLY | FAT_ATTRIBUTE_HIDDEN | FAT_ATTRIBUTE_SYSTEM | FAT_ATTRIBUTE_VOLUME_ID
+};
 
 struct FAT_ExtendedBootRecord
 {
@@ -54,7 +89,7 @@ struct FAT_BootSector
 
 struct FAT_FileData
 {
-  uint8_t Buffer[SECTOR_SIZE];
+  uint8_t Buffer[SectorSize];
   FAT_File Public;
   bool Opened;
   uint32_t FirstCluster;
@@ -68,3 +103,18 @@ struct FAT_LFNBlock
   int16_t chars[13];
 };
 
+struct FAT_DirectoryEntry
+{
+  uint8_t Name[11];
+  uint8_t Attributes;
+  uint8_t _Reserved;
+  uint8_t CreatedTimeTenths;
+  uint16_t CreatedTime;
+  uint16_t CreatedDate;
+  uint16_t AccessedDate;
+  uint16_t FirstClusterHigh;
+  uint16_t ModifiedTime;
+  uint16_t ModifiedDate;
+  uint16_t FirstClusterLow;
+  uint32_t Size;
+} __attribute__((packed));
