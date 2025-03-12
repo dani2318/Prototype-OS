@@ -1,5 +1,6 @@
 #pragma once
-#include <dev/BlockDevice.hpp>
+#include <core/dev/BlockDevice.hpp>
+#include "File.hpp"
 
 enum class FileType{
   File,
@@ -12,12 +13,19 @@ struct FileEntry
   FileType type;
 };
 
+enum FileOpenMode{
+  Read,
+  Write,
+  Append
+};
 
 class FileSystem
 {
   public:
-    FileSystem();
+    FileSystem() {};
     ~FileSystem(){};
     virtual bool Initialize(BlockDevice* device) = 0;
+    virtual FileEntry* GetNextFileEntry(FileEntry* parent, FileEntry* previous) = 0;
+    virtual File* Open(FileEntry* parent,FileOpenMode mode) = 0;
 };
 
