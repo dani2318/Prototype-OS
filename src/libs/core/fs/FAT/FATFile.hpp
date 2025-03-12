@@ -9,7 +9,7 @@ class FATFile : public File
 {
   public:
   FATFile();
-  bool Open(FATFileEntry* directoryEntry);
+  bool Open(FATFileEntry* fileEntry);
 
   bool IsOpened() const {return Opened;}
 

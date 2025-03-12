@@ -87,27 +87,27 @@ bool FATFileSystem::Initialize(BlockDevice *device)
     m_DataSectionLba = rootDirLba + rootDirSectors;
   }
 
-  m_data->RootDirectory.Public.handle = RootDirectoryHandle;
-  m_data->RootDirectory.Public.isDirectory = true;
-  m_data->RootDirectory.Public.Position = 0;
-  m_data->RootDirectory.Public.Size = sizeof(FAT_DirectoryEntry) * m_data->BS.BootSector.DirEntryCount;
-  m_data->RootDirectory.Opened = true;
-  m_data->RootDirectory.FirstCluster = rootDirLba;
-  m_data->RootDirectory.CurrentCluster = rootDirLba;
-  m_data->RootDirectory.CurrentSectorInCluster = 0;
+    // Detect FAT type
+    DetectFatType();
 
-  if (!ReadSector(rootDirLba, m_data->RootDirectory.Buffer))
-  {
-    Debug::Error(MODULE_NAME, "FAT: read root directory failed\r\n");
-    return false;
-  }
+  FATFileEntry rootEntry;
+  rootEntry.directoryEntry.FirstClusterLow = rootDirLba & 0xFFFF;
+  rootEntry.directoryEntry.FirstClusterHigh = rootDirLba & 0xFF;
+  rootEntry.directoryEntry.Size = sizeof(FAT_DirectoryEntry) * m_data->BS.BootSector.DirEntryCount;
+  m_data->RootDirectory.Open(&rootEntry);
 
-  // Detect FAT type
-  DetectFatType();
+
+  // if (!ReadSector(rootDirLba, m_data->RootDirectory.Buffer))
+  // {
+  //   Debug::Error(MODULE_NAME, "FAT: read root directory failed\r\n");
+  //   return false;
+  // }
+
+
 
   // reset open files
   for (int i = 0; i < MaxFileHandles; i++)
-    m_data->OpenedFiles[i].Opened = false;
+    m_data->OpenedFiles[i] = FATFile();
 
   m_data->LFNCount = 0;
 
@@ -138,13 +138,6 @@ File *FATFileSystem::Open(FileEntry *file, FileOpenMode mode)
 
   // setup vars
   m_data->OpenedFiles[handle].Open((FATFileEntry*) file);
-  fd->Public.handle = handle;
-  fd->Public.isDirectory = (entry->Attributes & FAT_ATTRIBUTE_DIRECTORY) != 0;
-  fd->Public.Position = 0;
-  fd->Public.Size = entry->Size;
-  fd->FirstCluster = entry->FirstClusterLow + ((uint32_t)entry->FirstClusterHigh << 16);
-  fd->CurrentCluster = fd->FirstCluster;
-  fd->CurrentSectorInCluster = 0;
 
   if (!Partition_ReadSectors(disk, FAT_ClusterToLba(fd->CurrentCluster), 1, fd->Buffer))
   {

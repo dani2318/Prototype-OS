@@ -10,7 +10,7 @@ constexpr int RootDirectoryHandle       =   -1;
 constexpr int FatCacheSize              =   5;
 constexpr uint32_t FAT_LFN_LAST         =   0x40;
 
-struct FAT_Data
+typedef struct
 {
     union
     {
@@ -20,6 +20,7 @@ struct FAT_Data
 
     FATFile RootDirectory;
 
+
     FATFile OpenedFiles[MaxFileHandles];
 
     uint8_t FatCache[FatCacheSize * SectorSize];
@@ -28,4 +29,4 @@ struct FAT_Data
     FAT_LFNBlock LFNBlock[FAT_LFN_LAST];
     int LFNCount;
 
-} ;
+} FAT_Data;

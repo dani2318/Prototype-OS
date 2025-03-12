@@ -1,10 +1,17 @@
 #include "FATFile.hpp"
 
 
-bool FATFile::Open(FAT_DirectoryEntry* directoryEntry){
+bool FATFile::Open(FATFileEntry* fileEntry){
   m_Position = 0;
-  m_Size = directoryEntry->Size;
-  m_FirstCluster = directoryEntry->FirstClusterLow + ((uint32_t)directoryEntry->FirstClusterHigh << 16);
+  m_Size = fileEntry->directoryEntry.Size;
+  m_FirstCluster = fileEntry->directoryEntry.FirstClusterLow + ((uint32_t)fileEntry->directoryEntry.FirstClusterHigh << 16);
   m_CurrentCluster = m_FirstCluster;
   m_CurrentSectorInCluster = 0;
+
+  if (!ReadSector(rootDirLba, m_data->RootDirectory.Buffer))
+  {
+    Debug::Error(MODULE_NAME, "FAT: read root directory failed\r\n");
+    return false;
+  }
+
 }
