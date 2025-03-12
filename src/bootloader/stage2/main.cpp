@@ -9,12 +9,18 @@
 #include <core/arch/i686/E9Device.hpp>
 #include <core/dev/TextDevice.hpp>
 #include <core/dev/RangeBlockDevice.hpp>
+#include <memory/Stage2Allocator.hpp>
 #include <core/Debug.hpp>
 #include "memdefs.h"
 
 arch::i686::VGATextDevice g_VGADevice;
 arch::i686::E9Device g_DebugDevice;
+
+Stage2Allocator g_allocator(reinterpret_cast<void*>(MEMORY_MIN),MEMORY_MAX-MEMORY_MIN);
+
 EXPORT void ASMCALL Start(uint16_t bootDrive, uint32_t partition){
+
+
   g_VGADevice.Clear();
   TextDevice screen(&g_VGADevice);
   Debug::AddOutputDevice(&screen, Debug::DebugLevel::LVL_INFO, false);

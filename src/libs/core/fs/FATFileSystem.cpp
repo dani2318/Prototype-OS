@@ -13,15 +13,15 @@ FATFileSystem::FATFileSystem(void *fsMemoryRegion)
 {
 }
 
-bool FATFileSystem::ReadSector(uint32_t lba, uint8_t* buffer){
-  m_device->Seek(SeekPos::Set,lba*SectorSize);
+bool FATFileSystem::ReadSector(uint32_t lba, uint8_t *buffer)
+{
+  m_device->Seek(SeekPos::Set, lba * SectorSize);
   return (m_device->Read(buffer, SectorSize)) == SectorSize;
 }
 
-
 bool FATFileSystem::ReadBootSector()
 {
-  return ReadSector(0,m_data->BS.BootSectorBytes);
+  return ReadSector(0, m_data->BS.BootSectorBytes);
 }
 
 uint32_t FATFileSystem::ClusterToLba(uint32_t cluster)
@@ -29,15 +29,20 @@ uint32_t FATFileSystem::ClusterToLba(uint32_t cluster)
   return m_DataSectionLba + (cluster - 2) * m_data->BS.BootSector.SectorsPerCluster;
 }
 
-void FATFileSystem::DetectFatType(){
+void FATFileSystem::DetectFatType()
+{
 
-  uint32_t dataClusters = (m_TotalSectors  - m_DataSectionLba) / m_data->BS.BootSector.SectorsPerCluster;
-  if(dataClusters < 0xFF5){
-      m_FatType = FAT12;
-  }else if (m_data->BS.BootSector.SectorsPerFat != 0){
-      m_FatType = FAT16;
-  }else m_FatType = FAT32;
-
+  uint32_t dataClusters = (m_TotalSectors - m_DataSectionLba) / m_data->BS.BootSector.SectorsPerCluster;
+  if (dataClusters < 0xFF5)
+  {
+    m_FatType = FAT12;
+  }
+  else if (m_data->BS.BootSector.SectorsPerFat != 0)
+  {
+    m_FatType = FAT16;
+  }
+  else
+    m_FatType = FAT32;
 }
 
 bool FATFileSystem::Initialize(BlockDevice *device)
@@ -87,23 +92,14 @@ bool FATFileSystem::Initialize(BlockDevice *device)
     m_DataSectionLba = rootDirLba + rootDirSectors;
   }
 
-    // Detect FAT type
-    DetectFatType();
+  // Detect FAT type
+  DetectFatType();
 
   FATFileEntry rootEntry;
   rootEntry.directoryEntry.FirstClusterLow = rootDirLba & 0xFFFF;
   rootEntry.directoryEntry.FirstClusterHigh = rootDirLba & 0xFF;
   rootEntry.directoryEntry.Size = sizeof(FAT_DirectoryEntry) * m_data->BS.BootSector.DirEntryCount;
   m_data->RootDirectory.Open(&rootEntry);
-
-
-  // if (!ReadSector(rootDirLba, m_data->RootDirectory.Buffer))
-  // {
-  //   Debug::Error(MODULE_NAME, "FAT: read root directory failed\r\n");
-  //   return false;
-  // }
-
-
 
   // reset open files
   for (int i = 0; i < MaxFileHandles; i++)
@@ -114,8 +110,9 @@ bool FATFileSystem::Initialize(BlockDevice *device)
   return true;
 }
 
-FileEntry *FATFileSystem::GetNextFileEntry(FileEntry *parent, FileEntry *previous)
+FileEntry* FATFileSystem::GetNextFileEntry(File* parent, const FileEntry& previous)
 {
+
 }
 
 File *FATFileSystem::Open(FileEntry *file, FileOpenMode mode)
@@ -125,31 +122,18 @@ File *FATFileSystem::Open(FileEntry *file, FileOpenMode mode)
   int handle = -1;
   for (int i = 0; i < MaxFileHandles && handle < 0; i++)
   {
-      if (!m_data->OpenedFiles[i].IsOpened())
-          handle = i;
+    if (!m_data->OpenedFiles[i].IsOpened())
+      handle = i;
   }
 
   // out of handles
   if (handle < 0)
   {
-      Debug::Error(MODULE_NAME, "FAT: out of file handles\r\n");
-      return nullptr;
+    Debug::Error(MODULE_NAME, "FAT: out of file handles\r\n");
+    return nullptr;
   }
 
   // setup vars
-  m_data->OpenedFiles[handle].Open((FATFileEntry*) file);
-
-  if (!Partition_ReadSectors(disk, FAT_ClusterToLba(fd->CurrentCluster), 1, fd->Buffer))
-  {
-      Debug::Error(MODULE_NAME, "FAT (Open Entry): read error (cluster:%u , lba:%u)\r\n", fd->CurrentCluster,FAT_ClusterToLba(fd->CurrentCluster));
-      for (int i = 0; i < 11; i++)
-      {
-        Debug::Error(MODULE_NAME, "%c", entry->Name[i]);
-      }
-      return false;
-  }
-
-  fd->Opened = true;
-  return &fd->Public;
-
+  m_data->OpenedFiles[handle].Open((FATFileEntry *)file);
+  return &m_data->OpenedFiles[handle];
 }
