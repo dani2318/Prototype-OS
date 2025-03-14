@@ -14,8 +14,8 @@ class FATFileSystem : public FileSystem {
     FATFileSystem();
     virtual bool Initialize(BlockDevice* device) override;
     virtual File* Open(FileEntry* file,FileOpenMode mode) override;
-    virtual FileEntry* GetNextFileEntry(File* parent, const FileEntry& previous);
-  private:
+    virtual File* Rootdirectory() override;
+    private:
 
   bool ReadBootSector();
   bool ReadSector(uint32_t lba, uint8_t* buffer);

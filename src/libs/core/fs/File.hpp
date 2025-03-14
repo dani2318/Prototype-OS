@@ -11,5 +11,6 @@ enum class SeekPos{
 
 class File : BlockDevice{
 public:
+  virtual FileEntry GetNextFileEntry(const FileEntry& previous);
 
 };

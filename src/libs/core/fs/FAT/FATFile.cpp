@@ -1,6 +1,8 @@
 #include "FATFile.hpp"
+#include <core/Debug.hpp>
+constexpr char *MODULE_NAME = "FATFile"; // Used for logging
 
-bool FATFile::Open(FATFileEntry *fileEntry)
+bool FATFile::Open(const fileEntry& fileEntry)
 {
   m_Position = 0;
   m_Size = fileEntry->directoryEntry.Size;
@@ -18,4 +20,11 @@ bool FATFile::Open(FATFileEntry *fileEntry)
 bool FATFile::ReadEntry(FAT_DirectoryEntry *directoryEntry)
 {
   return Read(reinterpret_cast<uint8_t *>(directoryEntry), sizeof(FAT_DirectoryEntry)) == sizeof(FAT_DirectoryEntry);
+}
+
+
+FileEntry FATFile::GetNextFileEntry(const FileEntry& previous)
+{
+  FileEntry fe;
+
 }

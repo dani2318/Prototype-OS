@@ -110,11 +110,10 @@ bool FATFileSystem::Initialize(BlockDevice *device)
   return true;
 }
 
-FileEntry* FATFileSystem::GetNextFileEntry(File* parent, const FileEntry& previous)
-{
-  static FileEntry fe;
-  return &fe;
+File* FATFileSystem::Rootdirectory() {
+  return &m_data->RootDirectory;
 }
+
 
 File *FATFileSystem::Open(FileEntry *file, FileOpenMode mode)
 {
