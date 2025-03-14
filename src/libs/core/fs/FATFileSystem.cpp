@@ -3,9 +3,9 @@
 
 constexpr char *MODULE_NAME = "FAT"; // Used for logging
 
-FATFileSystem::FATFileSystem(void *fsMemoryRegion)
+FATFileSystem::FATFileSystem()
     : m_device(nullptr),
-      m_data(reinterpret_cast<FAT_Data *>(fsMemoryRegion)),
+      m_data(new FAT_Data()),
       m_DataSectionLba(),
       m_FatType(),
       m_TotalSectors(),
@@ -112,7 +112,8 @@ bool FATFileSystem::Initialize(BlockDevice *device)
 
 FileEntry* FATFileSystem::GetNextFileEntry(File* parent, const FileEntry& previous)
 {
-
+  static FileEntry fe;
+  return &fe;
 }
 
 File *FATFileSystem::Open(FileEntry *file, FileOpenMode mode)

@@ -11,7 +11,7 @@ constexpr int FATReqMemory = 0x10000;
 class FATFileSystem : public FileSystem {
 
   public:
-    FATFileSystem(void* fsMemoryRegion);
+    FATFileSystem();
     virtual bool Initialize(BlockDevice* device) override;
     virtual File* Open(FileEntry* file,FileOpenMode mode) override;
     virtual FileEntry* GetNextFileEntry(File* parent, const FileEntry& previous);
