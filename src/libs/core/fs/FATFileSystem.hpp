@@ -2,7 +2,6 @@
 
 #include "FileSystem.hpp"
 #include <core/fs/FAT/FATData.hpp>
-#include <core/fs/FAT/FATFileEntry.hpp>
 #include <core/fs/FileEntry.hpp>
 #include <core/fs/FAT/FATHeaders.hpp>
 
@@ -15,10 +14,12 @@ class FATFileSystem : public FileSystem {
     virtual bool Initialize(BlockDevice* device) override;
     virtual File* Open(FileEntry* file,FileOpenMode mode) override;
     virtual File* Rootdirectory() override;
-    private:
+    bool ReadSector(uint32_t lba, uint8_t* buffer);
+    uint8_t FatType() const {return m_FatType;};
+
+  private:
 
   bool ReadBootSector();
-  bool ReadSector(uint32_t lba, uint8_t* buffer);
   uint32_t ClusterToLba(uint32_t cluster);
   void DetectFatType();
   BlockDevice* m_device;
