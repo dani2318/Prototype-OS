@@ -3,19 +3,21 @@
 #include <core/fs/File.hpp>
 #include <core/fs/FAT/FATHeaders.hpp>
 #include <core/fs/FileEntry.hpp>
-#include <core/fs/FATFileSystem.hpp>
+#include "core/fs/FATFileSystem.hpp"
+
+class FATFileSystem;
 
 class FATFile : public File
 {
 public:
   FATFile();
-  bool Open(FATFileSystem*fs,const FileEntry& fileEntry);
-  bool OpenRootDirectory1216(FATFileSystem*fs);
+  bool Open(FATFileSystem* fs,uint32_t firstCluster,uint32_t size);
+  bool OpenRootDirectory1216(FATFileSystem* fs,uint32_t rootDirLba,uint32_t rootDirSize);
 
   FileEntry GetNextFileEntry(const FileEntry& previous) override;
-  bool IsOpened() const { return Opened; }
+  bool IsOpened() const { return m_Opened; }
   bool ReadEntry(FAT_DirectoryEntry *directoryEntry);
-  virtual void Seek(SeekPos pos, int rel) = 0;
+  virtual void Seek(SeekPos pos, int rel) override;
   virtual size_t Write(const uint8_t* data, size_t size) = 0;
   virtual size_t Read(uint8_t* data, size_t size) = 0;
   virtual size_t Size() = 0;
@@ -23,7 +25,7 @@ public:
 private:
   uint8_t m_Buffer[SectorSize];
   FATFileSystem* m_fs;
-  bool Opened;
+  bool m_Opened;
   bool m_IsRootDir;
   uint32_t m_Position;
   uint32_t m_Size;

@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <core/fs/FAT/FATFile.hpp>
 constexpr int SectorSize                =   512;
 
 struct FAT_LongFileEntry
@@ -90,7 +91,7 @@ struct FAT_BootSector
 struct FAT_FileData
 {
   uint8_t Buffer[SectorSize];
-  FAT_File Public;
+  FATFile Public;
   bool Opened;
   uint32_t FirstCluster;
   uint32_t CurrentCluster;

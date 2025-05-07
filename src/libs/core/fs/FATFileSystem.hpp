@@ -14,11 +14,13 @@ class FATFileSystem : public FileSystem {
     virtual bool Initialize(BlockDevice* device) override;
     virtual File* Open(FileEntry* file,FileOpenMode mode) override;
     virtual File* Rootdirectory() override;
-    bool ReadSector(uint32_t lba, uint8_t* buffer);
+    bool ReadSector(uint32_t lba, uint8_t* buffer,uint32_t count=1);
+    bool ReadSectorFromCluster(uint32_t cluster,uint32_t sectorOffset, uint8_t* buffer);
     uint8_t FatType() const {return m_FatType;};
-
+    FAT_Data& Data(){return *m_data;}
+    uint32_t GetNextCluster(uint32_t currentCluster);
   private:
-
+  bool ReadFat(uint32_t lbaOffset);
   bool ReadBootSector();
   uint32_t ClusterToLba(uint32_t cluster);
   void DetectFatType();
