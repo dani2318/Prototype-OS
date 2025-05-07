@@ -132,6 +132,7 @@ uint32_t FAT_ClusterToLba(uint32_t cluster)
 {
     return g_DataSectionLba + (cluster - 2) * g_Data->BS.BootSector.SectorsPerCluster;
 }
+
 bool FAT_Initialize(Partition* disk)
 {
     g_Data = (FAT_Data *)MEMORY_FAT_ADDR;

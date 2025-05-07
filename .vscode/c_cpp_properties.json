@@ -5,12 +5,14 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/src/kernel/**",
+                "${workspaceFolder}/src/libs/core/**",
                 "${workspaceFolder}/src/bootloader/stage1/**",
                 "${workspaceFolder}/src/bootloader/stage2/**",
-                "${workspaceFolder}/toolchain/i686-elf/lib/gcc/i686-elf/11.2.0/include"
+                "${workspaceFolder}/toolchain/i686-elf/lib/gcc/i686-elf/11.2.0/include",
+                "${workspaceFolder}/src/libs"
             ],
             "defines": [],
-            "compilerPath": "/home/dani23/Prototype-OS/toolchain/i686-elf/bin/i686-elf-gcc",
+            "compilerPath": "${workspaceFolder}/toolchain/i686-elf/bin/i686-elf-gcc",
             "cStandard": "c99",
             "cppStandard": "c++14",
             "intelliSenseMode": "gcc-x86",
@@ -18,8 +20,7 @@
                 "-std=c99",
                 "-ffreestanding",
                 "-nostdlib"
-            ],
-
+            ]
         }
     ],
     "version": 4
